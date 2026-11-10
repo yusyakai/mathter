@@ -20,6 +20,10 @@
 - `npm run typecheck` 型検査
 - `npm run build` 型検査＋ビルド（`dist/`）
 
+## 公開
+
+GitHub Pages（`https://yusyakai.github.io/mathter/`）。`.github/workflows/deploy.yml` が push のたびにテスト・ビルドして `dist/` を配信する。
+
 ## 構成
 
 - `src/types.ts` 問題データの型
