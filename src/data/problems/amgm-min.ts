@@ -12,6 +12,11 @@ export const amgmMin: Problem = {
     { text: "最小値", fragmentId: "f3" },
     { text: " を求めよ。" },
   ],
+  fragments: [
+    { id: "f3", priority: 1 },
+    { id: "f2", priority: 2 },
+    { id: "f1", priority: 3 },
+  ],
   associations: [
     {
       id: "b1",

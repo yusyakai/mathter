@@ -11,6 +11,7 @@
 - Vite + React + TypeScript（ウェブアプリ。スマホ・PC共通。将来のVRは別の仕組みで作る方針）
 - 数式は KaTeX。文字列中の `$...$` を数式として表示する
 - テストは Vitest
+- ドラッグ＆ドロップは @dnd-kit/core（マウス・タッチ長押し・キーボード）
 - 思考ボードの状態は端末内（localStorage）にのみ保存する
 
 ## コマンド
@@ -29,11 +30,14 @@ GitHub Pages（`https://yusyakai.github.io/mathter/`）。`.github/workflows/dep
 - `src/types.ts` 問題データの型
 - `src/data/problems/` 内蔵する問題（1問1ファイル、`index.ts` に登録）
 - `src/thoughts.ts` 考えの組み合わせと問題データ検査のロジック
-- `src/components/AssociateView.tsx` 「連想する」画面（着眼点 → 連想 → 思考ボードでくっつける）
-- `src/components/SolutionView.tsx` 「解答との対応」画面（解答の行 ⇔ 問題文の部分）
+- `src/components/Workspace.tsx` 学習画面。「問題 → 思考ボード → 解答」の3つを並べ、思考ボードが問題と解答の橋渡しをする
+- `src/components/ProblemText.tsx` 問題文と着眼点の表示
 
 ## 設計方針
 
 - 正誤判定はしない。答えを教えるのではなく、着眼点と連想を見せる
 - ヒントを決まった順に出さない。どこを見るか、どれを開くかは学習者が選ぶ
+- 問題文には最初から色を付けない。どこに目をつけるかも学習の対象で、着眼点には見る順番（priority）がある
+- 連想はドラッグして思考ボードに集め、カード同士を重ねてくっつける。くっつけた2枚は新しい考え1枚に代わる
+- 模範解答は学習者が開くまで見せない
 - 画面の文言は日本語。中高生が読める言葉で書く

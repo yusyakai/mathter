@@ -14,6 +14,12 @@ export const quadraticMin: Problem = {
     { text: "最小値", fragmentId: "f4" },
     { text: " を求めよ。" },
   ],
+  fragments: [
+    { id: "f4", priority: 1 },
+    { id: "f1", priority: 2 },
+    { id: "f2", priority: 3 },
+    { id: "f3", priority: 4 },
+  ],
   associations: [
     {
       id: "a1",

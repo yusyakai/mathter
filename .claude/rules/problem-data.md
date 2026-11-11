@@ -7,8 +7,9 @@ paths:
 
 - 型は `src/types.ts` の `Problem`。1問1ファイルで作り、`src/data/problems/index.ts` の配列に追加する
 - `segments` は問題文を前から順に分けたもの。着眼点にする部分だけ `fragmentId` を付ける
+- `fragments` に着眼点の id と `priority`（見る順番の目安。1 が最初、重複なしの連番）を書く
 - 1つの着眼点につき連想（`associations`）は1〜3個。`title` は一言、`detail` は「なぜそう考えるか・どう使うか」
-- `combinations` の `from` は2つ。連想だけでなく、別の組み合わせの id も置ける。すべての組み合わせが連想から順にたどり着けること
+- `combinations` の `from` は2つ。連想だけでなく、別の組み合わせの id も置ける。すべての組み合わせが連想から順にたどり着けること。くっつけた2つは新しい考えに代わるので、1つの考えを元にできる組み合わせは1つまで
 - `solution` の各行に、もとになった着眼点（`fromFragments`）と考え（`fromThoughts`）を必ず付ける
 - 数式は `$...$` で囲む LaTeX。TypeScript の文字列なのでバックスラッシュは `\\` と書く
 - 問題集の問題文をそのまま写さない（類題か自作にする）

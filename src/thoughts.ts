@@ -18,21 +18,70 @@ export function findCombination(
   );
 }
 
-/** id の考えと、まだボードにない新しい考えを生み出せる相手（ボード上のもの）。 */
-export function partnersOf(problem: Problem, id: string, board: string[]): string[] {
-  return board.filter((other) => {
-    if (other === id) return false;
-    const c = findCombination(problem, id, other);
-    return c !== undefined && !board.includes(c.id);
-  });
+/**
+ * ボードに見えているカード。board には置いた考えすべての id が入っていて、
+ * くっつけて別の考えに代わったものは見せない。
+ */
+export function visibleCards(problem: Problem, board: string[]): string[] {
+  const merged = new Set(
+    problem.combinations.filter((c) => board.includes(c.id)).flatMap((c) => c.from),
+  );
+  return board.filter((id) => !merged.has(id));
+}
+
+/** id の考えを含んでいる、いま見えているカード。ボードになければ undefined。 */
+export function cardContaining(
+  problem: Problem,
+  board: string[],
+  id: string,
+): string | undefined {
+  if (!board.includes(id)) return undefined;
+  let current = id;
+  for (;;) {
+    const parent = problem.combinations.find(
+      (c) => board.includes(c.id) && c.from.includes(current),
+    );
+    if (!parent) return current;
+    current = parent.id;
+  }
+}
+
+/** 保存されていたボードから、知らない id や、元の考えが欠けた組み合わせを取り除く。 */
+export function sanitizeBoard(problem: Problem, board: string[]): string[] {
+  const known = allThoughts(problem);
+  let result = [...new Set(board)].filter((id) => known.has(id));
+  for (;;) {
+    const next = result.filter((id) => {
+      const t = known.get(id)!;
+      return t.kind === "association" || t.from.every((f) => result.includes(f));
+    });
+    if (next.length === result.length) return result;
+    result = next;
+  }
+}
+
+/** まだ見つけていない着眼点のうち、見る順番がいちばん早いもの。 */
+export function nextFragment(problem: Problem, found: string[]): string | undefined {
+  return [...problem.fragments]
+    .sort((a, b) => a.priority - b.priority)
+    .find((f) => !found.includes(f.id))?.id;
 }
 
 /** 問題データの参照切れなどを検査する。問題がなければ空配列。 */
 export function validateProblem(problem: Problem): string[] {
   const errors: string[] = [];
-  const fragmentIds = new Set(
-    problem.segments.flatMap((s) => (s.fragmentId ? [s.fragmentId] : [])),
-  );
+  const fragmentIds = new Set(problem.fragments.map((f) => f.id));
+  const inText = problem.segments.flatMap((s) => (s.fragmentId ? [s.fragmentId] : []));
+  for (const f of inText) {
+    if (!fragmentIds.has(f)) errors.push(`問題文の着眼点 ${f} が fragments にない`);
+  }
+  for (const f of fragmentIds) {
+    if (!inText.includes(f)) errors.push(`着眼点 ${f} が問題文にない`);
+  }
+  const priorities = problem.fragments.map((f) => f.priority).sort((a, b) => a - b);
+  if (priorities.some((p, i) => p !== i + 1)) {
+    errors.push("priority は 1 から順に重複なく付ける");
+  }
   const thoughtIds = new Set<string>();
   for (const t of [...problem.associations, ...problem.combinations]) {
     if (thoughtIds.has(t.id)) errors.push(`id が重複: ${t.id}`);
@@ -45,9 +94,12 @@ export function validateProblem(problem: Problem): string[] {
   for (const a of problem.associations) {
     if (!fragmentIds.has(a.fragmentId)) errors.push(`${a.id}: 着眼点 ${a.fragmentId} がない`);
   }
+  const used = new Set<string>();
   for (const c of problem.combinations) {
     for (const f of c.from) {
       if (!thoughtIds.has(f) || f === c.id) errors.push(`${c.id}: 元の考え ${f} が不正`);
+      if (used.has(f)) errors.push(`${f} を元にする組み合わせが2つ以上ある`);
+      used.add(f);
     }
   }
   for (const s of problem.solution) {

@@ -17,7 +17,10 @@ export interface Association {
   detail: RichText;
 }
 
-/** 2つの考えをくっつけると生まれる新しい考え。from には連想・組み合わせどちらの id も置ける。 */
+/**
+ * 2つの考えをくっつけると生まれる新しい考え。from には連想・組み合わせどちらの id も置ける。
+ * くっつけた2つは新しい考えに代わるので、1つの考えを元にできる組み合わせは1つまで。
+ */
 export interface Combination {
   id: string;
   from: [string, string];
@@ -33,11 +36,18 @@ export interface SolutionStep {
   fromThoughts: string[];
 }
 
+/** 着眼点。priority は「見る順番の目安」（1 が最初）。 */
+export interface Fragment {
+  id: string;
+  priority: number;
+}
+
 export interface Problem {
   id: string;
   title: string;
   unit: string;
   segments: TextSegment[];
+  fragments: Fragment[];
   associations: Association[];
   combinations: Combination[];
   solution: SolutionStep[];
