@@ -5,6 +5,8 @@ interface Props {
   problem: Problem;
   /** 学習者が見つけた着眼点。見つけるまでは色を付けない */
   found: string[];
+  /** 見る順番（丸数字）をすべての着眼点に表示するか */
+  showOrder: boolean;
   /** 選択中の着眼点 */
   active: string | null;
   /** 解答の行に対応する着眼点 */
@@ -16,13 +18,13 @@ interface Props {
 
 const circled = (n: number) => (n >= 1 && n <= 20 ? String.fromCharCode(0x245f + n) : `(${n})`);
 
-export function ProblemText({ problem, found, active, highlighted, onSelect, onMiss }: Props) {
+export function ProblemText({ problem, found, showOrder, active, highlighted, onSelect, onMiss }: Props) {
   return (
     <p className="problem-text" onClick={onMiss}>
       {problem.segments.map((seg, i) => {
         const id = seg.fragmentId;
         if (!id) return <Rich key={i} text={seg.text} />;
-        const isFound = found.includes(id);
+        const isFound = found.includes(id) || showOrder;
         const priority = problem.fragments.find((f) => f.id === id)?.priority;
         return (
           <button
@@ -40,7 +42,7 @@ export function ProblemText({ problem, found, active, highlighted, onSelect, onM
               onSelect(id);
             }}
           >
-            {isFound && priority !== undefined && (
+            {showOrder && priority !== undefined && (
               <span className="priority" aria-label={`見る順番 ${priority}`}>
                 {circled(priority)}
               </span>

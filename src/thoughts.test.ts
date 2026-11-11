@@ -4,7 +4,6 @@ import { problems } from "./data/problems";
 import {
   cardContaining,
   findCombination,
-  nextFragment,
   sanitizeBoard,
   validateProblem,
   visibleCards,
@@ -66,10 +65,5 @@ describe("思考ボード", () => {
   it("壊れた保存データを直す", () => {
     expect(sanitizeBoard(p, ["a1", "zz", "c1", "c3", "a1"])).toEqual(["a1"]);
     expect(sanitizeBoard(p, ["a1", "a4", "c1"])).toEqual(["a1", "a4", "c1"]);
-  });
-  it("見る順番どおりに次の着眼点が決まる", () => {
-    expect(nextFragment(p, [])).toBe("f4");
-    expect(nextFragment(p, ["f4", "f2"])).toBe("f1");
-    expect(nextFragment(p, ["f1", "f2", "f3", "f4"])).toBeUndefined();
   });
 });

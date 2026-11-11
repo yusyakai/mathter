@@ -60,13 +60,6 @@ export function sanitizeBoard(problem: Problem, board: string[]): string[] {
   }
 }
 
-/** まだ見つけていない着眼点のうち、見る順番がいちばん早いもの。 */
-export function nextFragment(problem: Problem, found: string[]): string | undefined {
-  return [...problem.fragments]
-    .sort((a, b) => a.priority - b.priority)
-    .find((f) => !found.includes(f.id))?.id;
-}
-
 /** 問題データの参照切れなどを検査する。問題がなければ空配列。 */
 export function validateProblem(problem: Problem): string[] {
   const errors: string[] = [];

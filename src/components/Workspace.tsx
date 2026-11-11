@@ -17,7 +17,6 @@ import {
   allThoughts,
   cardContaining,
   findCombination,
-  nextFragment,
   sanitizeBoard,
   visibleCards,
 } from "../thoughts";
@@ -61,6 +60,7 @@ export function Workspace({ problem }: { problem: Problem }) {
   const [opened, setOpened] = useState<string[]>([]);
   const [stepId, setStepId] = useState<string | null>(null);
   const [showSolution, setShowSolution] = useState(false);
+  const [showOrder, setShowOrder] = useState(false);
   const [problemMessage, setProblemMessage] = useState<string | null>(null);
   const [boardMessage, setBoardMessage] = useState<string | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
@@ -90,15 +90,6 @@ export function Workspace({ problem }: { problem: Problem }) {
     setFragment((f) => (f === id ? null : id));
   };
 
-  const showNext = () => {
-    const id = nextFragment(problem, found);
-    if (!id) return;
-    setProblemMessage(null);
-    setStepId(null);
-    setSaved((s) => ({ ...s, found: [...s.found, id] }));
-    setFragment(id);
-  };
-
   const onDragEnd = (e: DragEndEvent) => {
     setDragging(null);
     const id = String(e.active.id);
@@ -125,7 +116,6 @@ export function Workspace({ problem }: { problem: Problem }) {
   const stepCards = step
     ? step.fromThoughts.flatMap((t) => cardContaining(problem, board, t) ?? [])
     : [];
-  const remaining = nextFragment(problem, found) !== undefined;
   const draggingThought = dragging ? thoughts.get(dragging) : undefined;
 
   return (
@@ -142,6 +132,7 @@ export function Workspace({ problem }: { problem: Problem }) {
           <ProblemText
             problem={problem}
             found={found}
+            showOrder={showOrder}
             active={fragment}
             highlighted={step?.fromFragments ?? []}
             onSelect={selectFragment}
@@ -150,20 +141,25 @@ export function Workspace({ problem }: { problem: Problem }) {
             }
           />
           <p className="guide">
-            {found.length === 0
-              ? "まず、どこに目をつけますか？ 問題文の気になる部分をタップしてください。"
-              : "丸数字は、見る順番の目安です。出てきた連想は、思考ボードへドラッグできます。"}
+            {showOrder
+              ? "丸数字は、見る順番の目安です。"
+              : fragment
+                ? "出てきた連想は、思考ボードへドラッグできます。"
+                : "どこに目をつけますか？ 問題文の気になる部分をタップすると、そこからの連想が出ます。"}
           </p>
           {problemMessage && (
             <p className="message" role="status">
               {problemMessage}
             </p>
           )}
-          {remaining && (
-            <button type="button" className="hint-button" onClick={showNext}>
-              {found.length === 0 ? "どこから見ればいい？" : "次はどこを見ればいい？"}
-            </button>
-          )}
+          <button
+            type="button"
+            className="hint-button"
+            aria-pressed={showOrder}
+            onClick={() => setShowOrder((v) => !v)}
+          >
+            {showOrder ? "見る順番をかくす" : "見る順番を表示"}
+          </button>
 
           {candidates.length > 0 && (
             <ul className="cards">
