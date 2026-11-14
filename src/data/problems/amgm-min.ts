@@ -48,13 +48,10 @@ export const amgmMin: Problem = {
       detail:
         "$x>0$，$\\dfrac{4}{x}>0$ で、積が定数 $4$ になるので、和は $4$ 以上と分かる。",
     },
-    {
-      id: "d2",
-      from: ["d1", "b3"],
-      title: "等号成立 $x=\\dfrac{4}{x}$ を確認 → $x=2$ で最小値 $4$",
-      detail:
-        "等号は2つの数が等しいとき。$x=\\dfrac{4}{x}$ から $x^2=4$、$x>0$ より $x=2$。実際に $4$ になるので最小値は $4$。",
-    },
+  ],
+  skeleton: [
+    { id: "k1", thoughts: ["d1"] },
+    { id: "k2", thoughts: ["b3"] },
   ],
   solution: [
     {
@@ -67,13 +64,13 @@ export const amgmMin: Problem = {
       id: "t2",
       text: "等号が成り立つのは $x=\\dfrac{4}{x}$ すなわち $x^2=4$ のときで、$x>0$ より $x=2$",
       fromFragments: ["f1", "f3"],
-      fromThoughts: ["b3", "d2"],
+      fromThoughts: ["b3"],
     },
     {
       id: "t3",
       text: "よって、$x=2$ のとき最小値 $4$",
       fromFragments: ["f3"],
-      fromThoughts: ["d2"],
+      fromThoughts: ["b3"],
     },
   ],
 };

@@ -81,18 +81,16 @@ export const quadraticMin: Problem = {
     },
     {
       id: "c3",
-      from: ["c1", "a5"],
-      title: "軸 $x=a$ が区間 $0\\le x\\le 2$ の左・中・右のどこか",
+      from: ["a2", "a5"],
+      title: "グラフと定義域の位置関係で場合分けする",
       detail:
-        "動く軸と、動かない定義域の位置関係を考える。軸が区間の左（$a<0$）、中（$0\\le a\\le 2$）、右（$a>2$）の3通りがある。",
+        "放物線を定義域 $0\\le x\\le 2$ に重ねてかくと、軸が区間の左・中・右のどこにあるかで、一番低い点が変わる。この位置関係で場合分けする。",
     },
-    {
-      id: "c4",
-      from: ["c2", "c3"],
-      title: "方針：$a<0$，$0\\le a\\le 2$，$a>2$ で場合分けして最小値を求める",
-      detail:
-        "$a<0$ なら左端 $x=0$、$0\\le a\\le 2$ なら頂点 $x=a$、$a>2$ なら右端 $x=2$ で最小。それぞれ $y$ の値を計算すればよい。",
-    },
+  ],
+  skeleton: [
+    { id: "k1", thoughts: ["c1", "a1"] },
+    { id: "k2", thoughts: ["c3"] },
+    { id: "k3", thoughts: ["c2"] },
   ],
   solution: [
     {
@@ -105,25 +103,25 @@ export const quadraticMin: Problem = {
       id: "s2",
       text: "軸 $x=a$ と定義域 $0\\le x\\le 2$ の位置関係で場合分けする。",
       fromFragments: ["f2", "f3"],
-      fromThoughts: ["a4", "a5", "c3"],
+      fromThoughts: ["a2", "a5", "c3"],
     },
     {
       id: "s3",
       text: "(i) $a<0$ のとき　$x=0$ で最小値 $3$",
       fromFragments: ["f3", "f4"],
-      fromThoughts: ["c2", "c4"],
+      fromThoughts: ["a6", "c2"],
     },
     {
       id: "s4",
       text: "(ii) $0\\le a\\le 2$ のとき　$x=a$ で最小値 $-a^2+3$",
       fromFragments: ["f3", "f4"],
-      fromThoughts: ["c2", "c4"],
+      fromThoughts: ["a6", "c2"],
     },
     {
       id: "s5",
       text: "(iii) $a>2$ のとき　$x=2$ で最小値 $-4a+7$",
       fromFragments: ["f3", "f4"],
-      fromThoughts: ["c2", "c4"],
+      fromThoughts: ["a6", "c2"],
     },
   ],
 };

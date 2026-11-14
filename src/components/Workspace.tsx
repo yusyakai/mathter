@@ -16,32 +16,48 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   allThoughts,
   cardContaining,
+  checkSlot,
   findCombination,
   sanitizeBoard,
+  sanitizePlaced,
   visibleCards,
 } from "../thoughts";
+import type { SlotResult } from "../thoughts";
 import type { Problem, Thought } from "../types";
 import { ProblemText } from "./ProblemText";
 import { Rich } from "./Rich";
 
 const BOARD = "board";
+const SLOT = "slot:";
+
+const slotMessages: Record<SlotResult, string> = {
+  empty: "まだ空いています。",
+  ok: "ここで使う考えです。",
+  elsewhere: "この考えを使う場所は、ここではありません。",
+  "needs-merge": "ほかの考えとくっつけてから置くと、解答で使える考えになります。",
+  unused: "この考えは、解答の骨組みには直接は使いません。",
+};
 
 interface Saved {
   board: string[];
   found: string[];
+  /** 解答ボードの各段に置いた考え */
+  placed: (string | null)[];
 }
 
 function load(problem: Problem): Saved {
   try {
-    const raw = localStorage.getItem(`mathter:state:v2:${problem.id}`);
+    const raw = localStorage.getItem(`mathter:state:v3:${problem.id}`);
     const saved = raw ? (JSON.parse(raw) as Partial<Saved>) : {};
     const ids = problem.fragments.map((f) => f.id);
+    const board = sanitizeBoard(problem, Array.isArray(saved.board) ? saved.board : []);
     return {
-      board: sanitizeBoard(problem, Array.isArray(saved.board) ? saved.board : []),
+      board,
+      placed: sanitizePlaced(problem, board, Array.isArray(saved.placed) ? saved.placed : []),
       found: (Array.isArray(saved.found) ? saved.found : []).filter((f) => ids.includes(f)),
     };
   } catch {
-    return { board: [], found: [] };
+    return { board: [], found: [], placed: problem.skeleton.map(() => null) };
   }
 }
 
@@ -55,7 +71,8 @@ const collision: CollisionDetection = (args) => {
 export function Workspace({ problem }: { problem: Problem }) {
   const thoughts = useMemo(() => allThoughts(problem), [problem]);
   const [saved, setSaved] = useState<Saved>(() => load(problem));
-  const { board, found } = saved;
+  const { board, found, placed } = saved;
+  const [checked, setChecked] = useState(false);
   const [fragment, setFragment] = useState<string | null>(null);
   const [opened, setOpened] = useState<string[]>([]);
   const [stepId, setStepId] = useState<string | null>(null);
@@ -67,7 +84,7 @@ export function Workspace({ problem }: { problem: Problem }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem(`mathter:state:v2:${problem.id}`, JSON.stringify(saved));
+      localStorage.setItem(`mathter:state:v3:${problem.id}`, JSON.stringify(saved));
     } catch {
       // 保存できなくても学習は続けられる
     }
@@ -79,7 +96,6 @@ export function Workspace({ problem }: { problem: Problem }) {
     useSensor(KeyboardSensor),
   );
 
-  const setBoard = (next: string[]) => setSaved((s) => ({ ...s, board: next }));
   const toggleOpen = (id: string) =>
     setOpened((o) => (o.includes(id) ? o.filter((x) => x !== id) : [...o, id]));
 
@@ -96,23 +112,42 @@ export function Workspace({ problem }: { problem: Problem }) {
     const over = e.over ? String(e.over.id) : null;
     if (over === null) return;
     setBoardMessage(null);
-    let next = board.includes(id) ? board : [...board, id];
-    if (over !== BOARD && over !== id) {
-      const combo = findCombination(problem, id, over);
-      if (combo) {
-        next = [...next, combo.id];
-        setOpened((o) => [...o, combo.id]);
-        setBoardMessage("2つの考えがくっついて、新しい考えになりました。");
-      } else {
-        setBoardMessage("この2つからは、新しい考えは生まれませんでした。");
+    setChecked(false);
+    let nextBoard = board.includes(id) ? board : [...board, id];
+    const nextPlaced = [...placed];
+    const from = placed.indexOf(id);
+
+    if (over.startsWith(SLOT)) {
+      // 解答ボードに置く。置いてあった考えは、入れ替えるか思考ボードへ戻る
+      const to = Number(over.slice(SLOT.length));
+      if (from >= 0) nextPlaced[from] = placed[to];
+      nextPlaced[to] = id;
+    } else {
+      if (from >= 0) nextPlaced[from] = null;
+      if (over !== BOARD && over !== id) {
+        const combo = findCombination(problem, id, over);
+        if (combo) {
+          nextBoard = [...nextBoard, combo.id];
+          setOpened((o) => [...o, combo.id]);
+          setBoardMessage("2つの考えがくっついて、新しい考えになりました。");
+        } else {
+          setBoardMessage("この2つからは、新しい考えは生まれませんでした。");
+        }
       }
     }
-    setBoard(next);
+    setSaved((s) => ({ ...s, board: nextBoard, placed: nextPlaced }));
+  };
+
+  const unplace = (index: number) => {
+    setChecked(false);
+    setSaved((s) => ({ ...s, placed: s.placed.map((p, i) => (i === index ? null : p)) }));
   };
 
   const step = showSolution ? problem.solution.find((s) => s.id === stepId) : undefined;
   const candidates = problem.associations.filter((a) => a.fragmentId === fragment);
-  const cards = visibleCards(problem, board);
+  const cards = visibleCards(problem, board).filter((id) => !placed.includes(id));
+  const results = placed.map((id, i) => checkSlot(problem, i, id));
+  const complete = results.every((r) => r === "ok");
   const stepCards = step
     ? step.fromThoughts.flatMap((t) => cardContaining(problem, board, t) ?? [])
     : [];
@@ -181,8 +216,10 @@ export function Workspace({ problem }: { problem: Problem }) {
           <h2 id="h-board">思考ボード</h2>
           <p className="guide">
             {cards.length === 0
-              ? "使えそうだと思った連想を、ここへドラッグして集めます。"
-              : "カードを別のカードに重ねると、くっつけられます。スマホでは長押ししてから動かします。"}
+              ? board.length === 0
+                ? "使えそうだと思った連想を、ここへドラッグして集めます。"
+                : "カードはすべて解答ボードに置いてあります。"
+              : "カードを別のカードに重ねると、くっつけられます。解答で使う考えは、解答ボードへ運びます。スマホでは長押ししてから動かします。"}
           </p>
           {boardMessage && (
             <p className="message" role="status">
@@ -205,8 +242,9 @@ export function Workspace({ problem }: { problem: Problem }) {
                         ? t.from.map((f) => thoughts.get(f)?.title ?? f)
                         : undefined
                     }
+                    removeLabel={t.kind === "combination" ? "ばらす" : "外す"}
                     onRemove={() => {
-                      setBoard(board.filter((x) => x !== id));
+                      setSaved((s) => ({ ...s, board: s.board.filter((x) => x !== id) }));
                       setBoardMessage(null);
                     }}
                   />
@@ -216,12 +254,53 @@ export function Workspace({ problem }: { problem: Problem }) {
           </ul>
         </Board>
 
-        <section className="panel" aria-labelledby="h-solution">
-          <h2 id="h-solution">解答</h2>
+        <section className="panel" aria-labelledby="h-answer">
+          <h2 id="h-answer">解答ボード</h2>
+          <p className="guide">
+            解答で使う考えを、使う順に上から並べて、解答の骨組みを作ります。最初にすることを1番上に置きます。
+          </p>
+          <ol className="slots">
+            {placed.map((id, i) => {
+              const t = id ? thoughts.get(id) : undefined;
+              return (
+                <li key={i}>
+                  <Slot index={i} result={checked ? results[i] : null}>
+                    {t && (
+                      <Card
+                        thought={t}
+                        highlighted={stepCards.includes(t.id)}
+                        open={opened.includes(t.id)}
+                        onToggle={() => toggleOpen(t.id)}
+                        removeLabel="戻す"
+                        onRemove={() => unplace(i)}
+                      />
+                    )}
+                  </Slot>
+                </li>
+              );
+            })}
+          </ol>
+          {checked && complete && (
+            <p className="message" role="status">
+              骨組みができました。この順に、ノートで解いてみましょう。
+            </p>
+          )}
+          <button
+            type="button"
+            className="hint-button"
+            disabled={placed.every((p) => p === null)}
+            onClick={() => setChecked((v) => !v)}
+          >
+            {checked ? "確かめた結果をかくす" : "配置を確かめる"}
+          </button>
+
+          <h3 className="sub-heading" id="h-solution">
+            模範解答
+          </h3>
           {!showSolution ? (
             <>
               <p className="guide">
-                方針が立ったら、模範解答と見くらべます。解答の1行1行が、問題文のどこから、どの考えを通って生まれたかが分かります。
+                骨組みができたら、模範解答と見くらべます。解答の1行1行が、問題文のどこから、どの考えを通って生まれたかが分かります。
               </p>
               <button type="button" className="hint-button" onClick={() => setShowSolution(true)}>
                 模範解答を見る
@@ -230,7 +309,7 @@ export function Workspace({ problem }: { problem: Problem }) {
           ) : (
             <>
               <p className="guide">
-                行をタップすると、もとになった問題文の部分と、思考ボードの考えが光ります。
+                行をタップすると、もとになった問題文の部分と、ボードの考えが光ります。
               </p>
               <ol className="solution">
                 {problem.solution.map((s) => (
@@ -300,6 +379,40 @@ export function Workspace({ problem }: { problem: Problem }) {
   );
 }
 
+function Slot({
+  index,
+  result,
+  children,
+}: {
+  index: number;
+  result: SlotResult | null;
+  children: ReactNode;
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id: `${SLOT}${index}` });
+  return (
+    <div
+      ref={setNodeRef}
+      className={[
+        "slot",
+        isOver ? "is-over" : "",
+        result === "ok" ? "is-ok" : "",
+        result && result !== "ok" && result !== "empty" ? "is-off" : "",
+      ].join(" ")}
+    >
+      <span className="slot-number">{index + 1}</span>
+      <div className="slot-body">
+        {children || <span className="slot-empty">ここに考えを置く</span>}
+        {result && (
+          <p className="slot-result" role="status">
+            {result === "ok" ? "○ " : ""}
+            {slotMessages[result]}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Board({
   empty,
   active,
@@ -338,9 +451,20 @@ interface CardProps {
   highlighted?: boolean;
   sources?: string[];
   onRemove?: () => void;
+  removeLabel?: string;
 }
 
-function Card({ thought, open, onToggle, onBoard, placed, highlighted, sources, onRemove }: CardProps) {
+function Card({
+  thought,
+  open,
+  onToggle,
+  onBoard,
+  placed,
+  highlighted,
+  sources,
+  onRemove,
+  removeLabel,
+}: CardProps) {
   const drag = useDraggable({ id: thought.id, disabled: placed });
   const drop = useDroppable({ id: thought.id, disabled: !onBoard });
   const isTarget = drop.isOver && drop.active?.id !== thought.id;
@@ -390,7 +514,7 @@ function Card({ thought, open, onToggle, onBoard, placed, highlighted, sources, 
         </button>
         {onRemove && (
           <button type="button" onClick={onRemove}>
-            {thought.kind === "combination" ? "ばらす" : "外す"}
+            {removeLabel ?? "外す"}
           </button>
         )}
       </div>

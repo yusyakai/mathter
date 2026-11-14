@@ -42,6 +42,15 @@ export interface Fragment {
   priority: number;
 }
 
+/**
+ * 解答の骨組みの1段。上から順に並ぶ。thoughts は、この場所に置くと合っている考え
+ * （ふつうは1つ。くっつける前の考えも認めるときは複数）。
+ */
+export interface SkeletonStep {
+  id: string;
+  thoughts: string[];
+}
+
 export interface Problem {
   id: string;
   title: string;
@@ -50,6 +59,7 @@ export interface Problem {
   fragments: Fragment[];
   associations: Association[];
   combinations: Combination[];
+  skeleton: SkeletonStep[];
   solution: SolutionStep[];
 }
 

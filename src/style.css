@@ -112,3 +112,20 @@ button { cursor: pointer; }
 .step-why { margin: 4px 0 8px 12px; padding: 6px 12px; border-left: 3px solid var(--accent); font-size: 0.9rem; }
 .step-why-label { color: var(--muted); font-size: 0.8rem; }
 .step-why ul { margin: 0; padding-left: 1.2em; }
+.slots { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; }
+.slot {
+  display: flex; gap: 10px; align-items: flex-start; padding: 8px; min-height: 64px;
+  border: 2px dashed var(--line); border-radius: 12px; transition: border-color 0.15s, background 0.15s;
+}
+.slot.is-over { border-color: var(--accent); background: var(--accent-soft); }
+.slot.is-ok { border-style: solid; border-color: var(--combo-line); }
+.slot.is-off { border-style: solid; border-color: var(--mark-line); }
+.slot-number {
+  flex: none; width: 28px; height: 28px; margin-top: 8px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--line); font-size: 0.9rem; font-weight: 700;
+}
+.slot-body { flex: 1; min-width: 0; }
+.slot-empty { display: block; padding: 10px 0; color: var(--muted); font-size: 0.85rem; }
+.slot-result { margin: 6px 2px 0; font-size: 0.85rem; }
+.hint-button:disabled { opacity: 0.5; cursor: default; }
+.sub-heading { font-size: 0.95rem; color: var(--muted); margin: 20px 0 8px; padding-top: 14px; border-top: 1px solid var(--line); }
