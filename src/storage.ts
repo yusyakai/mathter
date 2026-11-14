@@ -1,4 +1,4 @@
-import { problems } from "./data/problems";
+import { playableProblems } from "./library";
 import { sanitizeBoard, sanitizePlaced } from "./thoughts";
 import type { Problem } from "./types";
 
@@ -62,7 +62,7 @@ export function loadRecord(): LearnerRecord {
   } catch {
     // 読めなければ空から始める
   }
-  for (const problem of problems) {
+  for (const problem of playableProblems()) {
     const { board } = loadState(problem);
     for (const a of problem.associations) {
       if (a.patternId && board.includes(a.id) && !seen.includes(a.patternId)) {

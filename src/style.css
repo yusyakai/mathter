@@ -154,3 +154,65 @@ button { cursor: pointer; }
 .slot-result { margin: 6px 2px 0; font-size: 0.85rem; }
 .hint-button:disabled { opacity: 0.5; cursor: default; }
 .sub-heading { font-size: 0.95rem; color: var(--muted); margin: 20px 0 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+
+/* 問題を作る画面 */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.toolbar .hint-button, .toolbar select { margin: 0; text-decoration: none; display: inline-flex; align-items: center; }
+.toolbar select, .field select, .field input, .field textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); color: var(--text); font: inherit; line-height: 1.6;
+}
+.toolbar select { width: auto; max-width: 100%; min-height: 36px; padding: 4px 10px; border-radius: 18px; font-size: 0.85rem; }
+.primary {
+  display: inline-flex; align-items: center; padding: 6px 18px; min-height: 40px; border: 1px solid var(--accent);
+  border-radius: 20px; background: var(--accent); color: var(--panel); text-decoration: none; font-size: 0.95rem; font-weight: 700;
+}
+.primary.is-disabled { opacity: 0.4; }
+.status.is-custom { border-color: var(--accent); margin-right: 6px; }
+li.problem-item:hover { border-color: var(--line); }
+.crumb-link { margin-left: 12px; color: var(--accent); }
+.editor { display: grid; gap: 16px; }
+.editor-bar {
+  position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 8px 16px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08); font-size: 0.95rem;
+}
+.saved { display: block; color: var(--muted); font-size: 0.75rem; }
+.editor-bar-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.editor-bar-actions .hint-button { margin: 0; }
+.editor-bar-actions a:not(.primary) { color: var(--accent); }
+.step-panel h2 { color: var(--text); font-size: 1.05rem; }
+.step-number { display: inline-grid; margin: 0 8px 0 0; vertical-align: middle; }
+.field { display: block; margin: 0 0 10px; }
+.field-label { display: block; color: var(--muted); font-size: 0.8rem; margin: 6px 0 2px; }
+.field-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.field-tools button, .row-buttons button {
+  padding: 2px 10px; min-height: 32px; border: 1px solid var(--line); border-radius: 16px; background: none; font-size: 0.8rem;
+}
+.field-preview {
+  display: block; margin-top: 4px; padding: 6px 10px; border-left: 3px solid var(--line);
+  background: var(--bg); border-radius: 0 8px 8px 0; overflow-x: auto;
+}
+.editor-preview { padding: 4px 12px; border: 1px dashed var(--line); border-radius: 10px; margin-bottom: 8px; }
+.editor-preview .fragment { pointer-events: none; }
+.block { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 0 0 12px; }
+.block-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 12px; margin-bottom: 4px; }
+.block-title { font-weight: 700; }
+.item { border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 8px; }
+.row-buttons { display: flex; gap: 6px; justify-content: flex-end; }
+.row-buttons button:disabled, .add-button:disabled { opacity: 0.4; cursor: default; }
+.add-button {
+  padding: 4px 14px; min-height: 36px; border: 1px dashed var(--accent); border-radius: 18px;
+  background: none; color: var(--accent); font-size: 0.85rem; margin: 4px 0 8px;
+}
+.pair { display: grid; gap: 0 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 620px) { .pair { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.chips button {
+  padding: 2px 12px; min-height: 34px; border: 1px solid var(--line); border-radius: 17px;
+  background: none; font-size: 0.85rem; text-align: left; max-width: 100%;
+}
+.chips button[aria-pressed="true"] { background: var(--mark); border-color: var(--mark-line); }
+.issues { margin: 8px 0 0; padding: 8px 12px 8px 30px; border-radius: 8px; font-size: 0.85rem; background: #fdecea; color: #8a1c14; }
+.issues li.is-note { color: var(--muted); }
+@media (prefers-color-scheme: dark) { .issues { background: #3a1d1a; color: #ffb4ab; } }

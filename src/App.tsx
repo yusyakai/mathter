@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { Editor } from "./components/Editor";
+import { MyProblems } from "./components/MyProblems";
 import { Notebook } from "./components/Notebook";
 import { ProblemList } from "./components/ProblemList";
 import { Workspace } from "./components/Workspace";
-import { problems } from "./data/problems";
+import { playableProblems, useCustomProblems } from "./library";
 import { loadRecord, saveRecord, type LearnerRecord } from "./storage";
 
 /** 画面の場所は URL の # 以降で表す（#/ 一覧、#/p/問題id、#/note 連想ノート）。 */
@@ -34,10 +36,15 @@ export function App() {
         : [...r.known, patternId],
     }));
 
+  const custom = useCustomProblems();
   const problem = hash.startsWith("#/p/")
-    ? problems.find((p) => p.id === decodeURIComponent(hash.slice(4)))
+    ? playableProblems(custom).find((p) => p.id === decodeURIComponent(hash.slice(4)))
     : undefined;
   const isNote = hash === "#/note";
+  const isEdit = hash.startsWith("#/edit");
+  const editing = hash.startsWith("#/edit/")
+    ? custom.find((p) => p.id === decodeURIComponent(hash.slice(7)))
+    : undefined;
 
   return (
     <div className="app">
@@ -46,11 +53,14 @@ export function App() {
           <a href="#/">mathter</a>
         </h1>
         <nav className="nav">
-          <a href="#/" aria-current={!problem && !isNote ? "page" : undefined}>
+          <a href="#/" aria-current={!problem && !isNote && !isEdit ? "page" : undefined}>
             問題
           </a>
           <a href="#/note" aria-current={isNote ? "page" : undefined}>
             連想ノート
+          </a>
+          <a href="#/edit" aria-current={isEdit ? "page" : undefined}>
+            問題を作る
           </a>
         </nav>
       </header>
@@ -58,6 +68,11 @@ export function App() {
         <>
           <p className="crumb">
             {problem.unit}｜{problem.title}
+            {custom.some((p) => p.id === problem.id) && (
+              <a className="crumb-link" href={`#/edit/${problem.id}`}>
+                この問題を直す
+              </a>
+            )}
           </p>
           <Workspace
             key={problem.id}
@@ -67,6 +82,10 @@ export function App() {
             onToggleKnown={toggleKnown}
           />
         </>
+      ) : editing ? (
+        <Editor key={editing.id} problem={editing} />
+      ) : isEdit ? (
+        <MyProblems />
       ) : isNote ? (
         <Notebook record={record} onToggleKnown={toggleKnown} />
       ) : (

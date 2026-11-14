@@ -1,4 +1,4 @@
-import { problems } from "../data/problems";
+import { isCustom, playableProblems, useCustomProblems } from "../library";
 import { loadState } from "../storage";
 import { checkSlot } from "../thoughts";
 import type { Problem } from "../types";
@@ -11,6 +11,7 @@ function status(problem: Problem): string | null {
 }
 
 export function ProblemList() {
+  const problems = playableProblems(useCustomProblems());
   const units = [...new Set(problems.map((p) => p.unit))];
   return (
     <main className="page">
@@ -27,7 +28,10 @@ export function ProblemList() {
                     <a className="problem-item" href={`#/p/${p.id}`}>
                       <span className="problem-item-title">
                         {p.title}
-                        {s && <span className="status">{s}</span>}
+                        <span>
+                          {isCustom(p.id) && <span className="status is-custom">自作</span>}
+                          {s && <span className="status">{s}</span>}
+                        </span>
                       </span>
                       <span className="problem-item-text">
                         <Rich text={p.segments.map((x) => x.text).join("")} />

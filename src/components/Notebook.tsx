@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { patterns } from "../data/patterns";
-import { problems } from "../data/problems";
+import { playableProblems, useCustomProblems } from "../library";
 import type { LearnerRecord } from "../storage";
 import { Rich } from "./Rich";
 
@@ -14,6 +14,7 @@ export function Notebook({ record, onToggleKnown }: Props) {
   const [opened, setOpened] = useState<string[]>([]);
   const toggle = (id: string) =>
     setOpened((o) => (o.includes(id) ? o.filter((x) => x !== id) : [...o, id]));
+  const problems = playableProblems(useCustomProblems());
   const units = [...new Set(patterns.map((p) => p.unit))];
 
   return (
