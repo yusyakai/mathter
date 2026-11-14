@@ -11,6 +11,8 @@ export interface TextSegment {
 export interface Association {
   id: string;
   fragmentId: string;
+  /** この連想があてはまる型（`src/data/patterns.ts`）。その問題だけの連想なら省く */
+  patternId?: string;
   /** カードに出す短い一言 */
   title: RichText;
   /** 思考する内容（なぜそう考えるか、どう使うか） */
@@ -67,3 +69,14 @@ export interface Problem {
 export type Thought =
   | ({ kind: "association" } & Association)
   | ({ kind: "combination" } & Combination);
+
+/** 連想の型。問題をまたいで共通の「きっかけ → 連想」。連想ノートに貯まる。 */
+export interface Pattern {
+  id: string;
+  unit: string;
+  /** 何を見たら */
+  trigger: RichText;
+  /** 何を連想するか */
+  idea: RichText;
+  detail: RichText;
+}

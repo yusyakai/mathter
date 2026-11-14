@@ -23,6 +23,7 @@ export const quadraticMin: Problem = {
   associations: [
     {
       id: "a1",
+      patternId: "complete-square",
       fragmentId: "f1",
       title: "平方完成して、頂点と軸を調べる",
       detail:
@@ -30,6 +31,7 @@ export const quadraticMin: Problem = {
     },
     {
       id: "a2",
+      patternId: "draw-graph",
       fragmentId: "f1",
       title: "グラフ（放物線）をかいて考える",
       detail:
@@ -37,6 +39,7 @@ export const quadraticMin: Problem = {
     },
     {
       id: "a3",
+      patternId: "convex",
       fragmentId: "f2",
       title: "$x^2$ の係数が正 → 下に凸",
       detail:
@@ -44,6 +47,7 @@ export const quadraticMin: Problem = {
     },
     {
       id: "a4",
+      patternId: "param-moves",
       fragmentId: "f2",
       title: "文字 $a$ を含む → グラフの位置が $a$ で変わる",
       detail:
@@ -51,6 +55,7 @@ export const quadraticMin: Problem = {
     },
     {
       id: "a5",
+      patternId: "domain-ends",
       fragmentId: "f3",
       title: "定義域に制限 → 端点 $x=0,\\ 2$ も候補",
       detail:
@@ -58,6 +63,7 @@ export const quadraticMin: Problem = {
     },
     {
       id: "a6",
+      patternId: "extreme-candidates",
       fragmentId: "f4",
       title: "最小値をとるのは「頂点」か「端点」",
       detail:

@@ -20,6 +20,7 @@ export const amgmMin: Problem = {
   associations: [
     {
       id: "b1",
+      patternId: "amgm-positive",
       fragmentId: "f1",
       title: "「正の数」という条件 → 相加平均・相乗平均が使える",
       detail:
@@ -27,6 +28,7 @@ export const amgmMin: Problem = {
     },
     {
       id: "b2",
+      patternId: "amgm-product",
       fragmentId: "f2",
       title: "$x$ と $\\dfrac{4}{x}$ は、掛けると $x$ が消える",
       detail:
@@ -34,6 +36,7 @@ export const amgmMin: Problem = {
     },
     {
       id: "b3",
+      patternId: "equality-check",
       fragmentId: "f3",
       title: "「〜以上」だけでは最小値と言えない",
       detail:

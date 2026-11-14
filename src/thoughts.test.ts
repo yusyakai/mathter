@@ -1,5 +1,6 @@
 import katex from "katex";
 import { describe, expect, it } from "vitest";
+import { patterns } from "./data/patterns";
 import { problems } from "./data/problems";
 import {
   cardContaining,
@@ -15,6 +16,12 @@ import {
 describe.each(problems)("問題データ $id", (problem) => {
   it("参照切れがない", () => {
     expect(validateProblem(problem)).toEqual([]);
+  });
+
+  it("連想の型がすべて辞書にある", () => {
+    const ids = new Set(patterns.map((x) => x.id));
+    const missing = problem.associations.filter((a) => a.patternId && !ids.has(a.patternId));
+    expect(missing).toEqual([]);
   });
 
   it("LaTeX がすべて解釈できる", () => {
@@ -50,7 +57,7 @@ describe.each(problems)("問題データ $id", (problem) => {
 });
 
 describe("思考ボード", () => {
-  const p = problems[0];
+  const p = problems.find((x) => x.id === "quadratic-min")!;
   it("順不同で組み合わせが見つかる", () => {
     expect(findCombination(p, "a4", "a1")?.id).toBe("c1");
     expect(findCombination(p, "a1", "a2")).toBeUndefined();
@@ -72,7 +79,7 @@ describe("思考ボード", () => {
 });
 
 describe("解答ボード", () => {
-  const p = problems[0];
+  const p = problems.find((x) => x.id === "quadratic-min")!;
   it("置いた場所が合っているかが分かる", () => {
     expect(checkSlot(p, 0, null)).toBe("empty");
     expect(checkSlot(p, 0, "c1")).toBe("ok");
@@ -93,5 +100,22 @@ describe("解答ボード", () => {
       "c1",
       null,
     ]);
+  });
+});
+
+describe("連想の型", () => {
+  it("id が重複せず、LaTeX が解釈でき、どれかの問題で使われている", () => {
+    expect(new Set(patterns.map((x) => x.id)).size).toBe(patterns.length);
+    const used = new Set(problems.flatMap((x) => x.associations.map((a) => a.patternId)));
+    expect(patterns.filter((x) => !used.has(x.id)).map((x) => x.id)).toEqual([]);
+    for (const x of patterns) {
+      for (const t of [x.trigger, x.idea, x.detail]) {
+        t.split("$").forEach((part, i) => {
+          if (i % 2 === 1) {
+            expect(() => katex.renderToString(part, { throwOnError: true })).not.toThrow();
+          }
+        });
+      }
+    }
   });
 });

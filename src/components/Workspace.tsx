@@ -18,10 +18,9 @@ import {
   cardContaining,
   checkSlot,
   findCombination,
-  sanitizeBoard,
-  sanitizePlaced,
   visibleCards,
 } from "../thoughts";
+import { loadState, saveState, type Saved } from "../storage";
 import type { SlotResult } from "../thoughts";
 import type { Problem, Thought } from "../types";
 import { ProblemText } from "./ProblemText";
@@ -38,29 +37,6 @@ const slotMessages: Record<SlotResult, string> = {
   unused: "この考えは、解答の骨組みには直接は使いません。",
 };
 
-interface Saved {
-  board: string[];
-  found: string[];
-  /** 解答ボードの各段に置いた考え */
-  placed: (string | null)[];
-}
-
-function load(problem: Problem): Saved {
-  try {
-    const raw = localStorage.getItem(`mathter:state:v3:${problem.id}`);
-    const saved = raw ? (JSON.parse(raw) as Partial<Saved>) : {};
-    const ids = problem.fragments.map((f) => f.id);
-    const board = sanitizeBoard(problem, Array.isArray(saved.board) ? saved.board : []);
-    return {
-      board,
-      placed: sanitizePlaced(problem, board, Array.isArray(saved.placed) ? saved.placed : []),
-      found: (Array.isArray(saved.found) ? saved.found : []).filter((f) => ids.includes(f)),
-    };
-  } catch {
-    return { board: [], found: [], placed: problem.skeleton.map(() => null) };
-  }
-}
-
 /** カードの上に落としたときはカードを、それ以外はボード全体を落とし先にする。 */
 const collision: CollisionDetection = (args) => {
   const hits = pointerWithin(args);
@@ -68,9 +44,18 @@ const collision: CollisionDetection = (args) => {
   return card ? [card] : hits;
 };
 
-export function Workspace({ problem }: { problem: Problem }) {
+interface Props {
+  problem: Problem;
+  /** 「もう分かる」の印が付いた型 */
+  known: string[];
+  /** 連想を思考ボードに集めたとき */
+  onCollect: (patternId: string) => void;
+  onToggleKnown: (patternId: string) => void;
+}
+
+export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
   const thoughts = useMemo(() => allThoughts(problem), [problem]);
-  const [saved, setSaved] = useState<Saved>(() => load(problem));
+  const [saved, setSaved] = useState<Saved>(() => loadState(problem));
   const { board, found, placed } = saved;
   const [checked, setChecked] = useState(false);
   const [fragment, setFragment] = useState<string | null>(null);
@@ -82,13 +67,7 @@ export function Workspace({ problem }: { problem: Problem }) {
   const [boardMessage, setBoardMessage] = useState<string | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(`mathter:state:v3:${problem.id}`, JSON.stringify(saved));
-    } catch {
-      // 保存できなくても学習は続けられる
-    }
-  }, [problem.id, saved]);
+  useEffect(() => saveState(problem.id, saved), [problem.id, saved]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
@@ -113,7 +92,12 @@ export function Workspace({ problem }: { problem: Problem }) {
     if (over === null) return;
     setBoardMessage(null);
     setChecked(false);
-    let nextBoard = board.includes(id) ? board : [...board, id];
+    let nextBoard = board;
+    if (!board.includes(id)) {
+      nextBoard = [...board, id];
+      const collected = thoughts.get(id);
+      if (collected?.kind === "association" && collected.patternId) onCollect(collected.patternId);
+    }
     const nextPlaced = [...placed];
     const from = placed.indexOf(id);
 
@@ -141,6 +125,19 @@ export function Workspace({ problem }: { problem: Problem }) {
   const unplace = (index: number) => {
     setChecked(false);
     setSaved((s) => ({ ...s, placed: s.placed.map((p, i) => (i === index ? null : p)) }));
+  };
+
+  const patternOf = (id: string) => {
+    const t = thoughts.get(id);
+    return t?.kind === "association" ? t.patternId : undefined;
+  };
+  const isKnown = (id: string) => {
+    const pattern = patternOf(id);
+    return pattern !== undefined && known.includes(pattern);
+  };
+  const toggleKnownOf = (id: string) => {
+    const pattern = patternOf(id);
+    return pattern ? () => onToggleKnown(pattern) : undefined;
   };
 
   const step = showSolution ? problem.solution.find((s) => s.id === stepId) : undefined;
@@ -202,6 +199,8 @@ export function Workspace({ problem }: { problem: Problem }) {
                 <li key={a.id}>
                   <Card
                     thought={thoughts.get(a.id)!}
+                    known={isKnown(a.id)}
+                    onToggleKnown={toggleKnownOf(a.id)}
                     placed={board.includes(a.id)}
                     open={opened.includes(a.id)}
                     onToggle={() => toggleOpen(a.id)}
@@ -233,6 +232,8 @@ export function Workspace({ problem }: { problem: Problem }) {
                 <li key={id}>
                   <Card
                     thought={t}
+                    known={isKnown(id)}
+                    onToggleKnown={toggleKnownOf(id)}
                     onBoard
                     highlighted={stepCards.includes(id)}
                     open={opened.includes(id)}
@@ -268,6 +269,8 @@ export function Workspace({ problem }: { problem: Problem }) {
                     {t && (
                       <Card
                         thought={t}
+                        known={isKnown(t.id)}
+                        onToggleKnown={toggleKnownOf(t.id)}
                         highlighted={stepCards.includes(t.id)}
                         open={opened.includes(t.id)}
                         onToggle={() => toggleOpen(t.id)}
@@ -452,6 +455,9 @@ interface CardProps {
   sources?: string[];
   onRemove?: () => void;
   removeLabel?: string;
+  /** この連想の型に「もう分かる」の印が付いているか */
+  known?: boolean;
+  onToggleKnown?: () => void;
 }
 
 function Card({
@@ -464,6 +470,8 @@ function Card({
   sources,
   onRemove,
   removeLabel,
+  known,
+  onToggleKnown,
 }: CardProps) {
   const drag = useDraggable({ id: thought.id, disabled: placed });
   const drop = useDroppable({ id: thought.id, disabled: !onBoard });
@@ -479,6 +487,7 @@ function Card({
         "card",
         placed ? "is-placed" : "is-draggable",
         thought.kind === "combination" ? "is-combination" : "",
+        known ? "is-known" : "",
         drag.isDragging ? "is-dragging" : "",
         isTarget ? "is-target" : "",
         highlighted ? "is-highlighted" : "",
@@ -505,9 +514,15 @@ function Card({
       {open && (
         <div className="card-detail">
           <Rich text={thought.detail} />
+          {onToggleKnown && (
+            <button type="button" className="known-button" aria-pressed={known} onClick={onToggleKnown}>
+              {known ? "✓ もう分かる（印を外す）" : "もう分かる"}
+            </button>
+          )}
         </div>
       )}
       <div className="card-actions">
+        {known && <span className="placed-mark">✓ 分かる</span>}
         {placed && <span className="placed-mark">ボードにあります</span>}
         <button type="button" onClick={onToggle}>
           {open ? "とじる" : "くわしく"}
