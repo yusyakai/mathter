@@ -65,11 +65,7 @@ button { cursor: pointer; }
 .pattern-links { margin: 0; padding-left: 1.2em; }
 .pattern-links a { color: var(--accent); }
 .card.is-known .card-title { font-weight: 400; font-size: 0.9rem; color: var(--muted); }
-.known-button {
-  display: block; margin-top: 8px; padding: 4px 12px; min-height: 36px; border: 1px solid var(--combo-line);
-  border-radius: 18px; background: none; font-size: 0.85rem;
-}
-.card-actions button[aria-pressed="true"], .known-button[aria-pressed="true"] { background: var(--combo); border-color: var(--combo-line); }
+.card-actions button[aria-pressed="true"] { background: var(--combo); border-color: var(--combo-line); }
 .workspace { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); margin-top: 12px; }
 @media (min-width: 1080px) {
   .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; }
@@ -81,14 +77,15 @@ button { cursor: pointer; }
 }
 .count { font-weight: 400; }
 .problem-text { font-size: 1.15rem; line-height: 2.6; margin: 0 0 8px; }
-.fragment {
-  padding: 4px 2px; margin: 0; border: none; border-radius: 6px;
-  background: none; border-bottom: 2px solid transparent; cursor: text;
-}
+.fragment { border-radius: 6px; border-bottom: 2px solid transparent; }
+.fragment:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* 見つけた着眼点は、1つのまとまり（札）として見せる */
 .fragment.is-found {
-  padding: 4px 6px; margin: 0 1px; cursor: pointer;
+  display: inline-block; padding: 2px 6px; margin: 0 1px; line-height: 1.5; cursor: pointer;
   background: var(--accent-soft); border-bottom: 2px dashed var(--accent);
 }
+.fragment.is-found.is-draggable { cursor: grab; touch-action: manipulation; -webkit-touch-callout: none; }
+.fragment.is-dragging { opacity: 0.35; }
 .fragment.is-active { background: var(--accent); color: var(--panel); border-bottom-style: solid; }
 .fragment.is-highlighted, .step.is-highlighted { background: var(--mark); border-color: var(--mark-line); color: var(--text); }
 .fragment.is-highlighted { border-bottom: 2px solid var(--mark-line); }
@@ -124,9 +121,8 @@ button { cursor: pointer; }
 .board { min-height: 220px; transition: border-color 0.15s, background 0.15s; }
 .board.is-ready { border-style: dashed; border-color: var(--accent); }
 .board.is-over { background: var(--accent-soft); }
-.sources { display: block; font-size: 0.8rem; color: var(--muted); line-height: 1.9; }
+.sources { margin: 0 0 6px; font-size: 0.8rem; color: var(--muted); line-height: 1.9; }
 .chip { display: inline-block; padding: 0 8px; border: 1px solid var(--combo-line); border-radius: 12px; }
-.arrow { display: block; }
 .solution { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
 .step {
   display: block; width: 100%; text-align: left; padding: 8px 10px; overflow-x: auto;
@@ -137,20 +133,10 @@ button { cursor: pointer; }
 .step-why { margin: 4px 0 8px 12px; padding: 6px 12px; border-left: 3px solid var(--accent); font-size: 0.9rem; }
 .step-why-label { color: var(--muted); font-size: 0.8rem; }
 .step-why ul { margin: 0; padding-left: 1.2em; }
-.slots { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; }
-.slot {
-  display: flex; gap: 10px; align-items: flex-start; padding: 8px; min-height: 64px;
-  border: 2px dashed var(--line); border-radius: 12px; transition: border-color 0.15s, background 0.15s;
-}
-.slot.is-over { border-color: var(--accent); background: var(--accent-soft); }
-.slot.is-ok { border-style: solid; border-color: var(--combo-line); }
-.slot.is-off { border-style: solid; border-color: var(--mark-line); }
 .slot-number {
   flex: none; width: 28px; height: 28px; margin-top: 8px; border-radius: 50%;
   display: grid; place-items: center; background: var(--line); font-size: 0.9rem; font-weight: 700;
 }
-.slot-body { flex: 1; min-width: 0; }
-.slot-empty { display: block; padding: 10px 0; color: var(--muted); font-size: 0.85rem; }
 .slot-result { margin: 6px 2px 0; font-size: 0.85rem; }
 .hint-button:disabled { opacity: 0.5; cursor: default; }
 .sub-heading { font-size: 0.95rem; color: var(--muted); margin: 20px 0 8px; padding-top: 14px; border-top: 1px solid var(--line); }
@@ -194,7 +180,6 @@ li.problem-item:hover { border-color: var(--line); }
   background: var(--bg); border-radius: 0 8px 8px 0; overflow-x: auto;
 }
 .editor-preview { padding: 4px 12px; border: 1px dashed var(--line); border-radius: 10px; margin-bottom: 8px; }
-.editor-preview .fragment { pointer-events: none; }
 .block { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 0 0 12px; }
 .block-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 12px; margin-bottom: 4px; }
 .block-title { font-weight: 700; }
@@ -262,3 +247,74 @@ li.problem-item:hover { border-color: var(--line); }
 .link-button { margin-left: 10px; padding: 0; border: none; background: none; color: var(--accent); text-decoration: underline; font-size: inherit; }
 .nav { flex-wrap: wrap; }
 .study-time { margin: 0 0 10px; color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+/* 運べることば（問題文や、カードの説明の中） */
+/* ことば1つを、途中で折り返さないまとまりにする（つかみやすく、数式の途中でも切れない） */
+.word { display: inline-block; cursor: grab; border-radius: 4px; touch-action: manipulation; -webkit-touch-callout: none; }
+.word.is-dragging { opacity: 0.35; }
+@media (hover: hover) { .word:hover { box-shadow: 0 2px 0 var(--muted); } }
+.problem-text.is-drag, .card-text { user-select: none; -webkit-user-select: none; }
+
+/* 考えのカード。ふだんは単語や短い文だけの小さなカードで、タップすると説明が開く */
+.thoughts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.thoughts > li { max-width: 100%; }
+.thoughts > li.is-open { flex-basis: 100%; }
+.thought { padding: 0; max-width: 100%; }
+.card-head {
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 4px 10px 4px 12px;
+  border: none; border-radius: 10px; background: none; text-align: left; cursor: inherit;
+}
+.card-head .card-title { display: inline; }
+.card-mark { white-space: nowrap; font-size: 0.7rem; color: var(--muted); }
+.card-chevron { margin-left: auto; color: var(--muted); font-size: 0.7rem; }
+.thought .card-detail { margin: 0; padding: 8px 12px 10px; cursor: auto; }
+.card-text { margin: 0; }
+.thought .card-actions { flex-wrap: wrap; }
+
+/* 解答ボード。運んだことばを、上から順の段に並べる */
+.answer-rows { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 8px; }
+.answer-row {
+  display: flex; gap: 8px; align-items: flex-start; padding: 6px 8px; border: 1px solid var(--line);
+  border-radius: 12px; transition: border-color 0.15s, background 0.15s;
+}
+.answer-row.is-over { border-color: var(--accent); background: var(--accent-soft); }
+.answer-row.is-ok { border-color: var(--combo-line); }
+.answer-row.is-off { border-color: var(--mark-line); }
+.answer-row .slot-number { margin-top: 3px; }
+.answer-row .row-buttons { flex: none; margin-top: 1px; }
+.row-body { flex: 1; min-width: 0; }
+.row-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 34px; }
+.snippet {
+  display: inline-flex; align-items: center; gap: 2px; max-width: 100%; min-height: 34px; padding: 0 4px 0 12px;
+  border: 1px solid var(--accent); border-radius: 17px; background: var(--accent-soft); font-size: 0.95rem;
+  cursor: grab; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.snippet-text { min-width: 0; overflow-x: auto; }
+.snippet-remove {
+  flex: none; width: 26px; height: 26px; padding: 0; border: none; border-radius: 50%;
+  background: none; color: var(--muted); font-size: 1rem; line-height: 1;
+}
+.snippet-remove:hover { background: var(--line); }
+.snippet.is-dragging { opacity: 0.35; }
+.snippet.is-target { box-shadow: -4px 0 0 var(--accent); }
+.snippet.is-highlighted { background: var(--mark); border-color: var(--mark-line); }
+.snippet.is-overlay { padding-right: 12px; white-space: nowrap; cursor: grabbing; box-shadow: 0 8px 24px rgb(0 0 0 / 0.25); }
+.answer-new {
+  margin: 0 0 12px; padding: 12px; border: 2px dashed var(--line); border-radius: 12px;
+  color: var(--muted); font-size: 0.85rem; text-align: center; transition: border-color 0.15s, background 0.15s;
+}
+.answer-area.is-ready .answer-new { border-color: var(--accent); }
+.answer-area.is-over .answer-new { border-color: var(--accent); background: var(--accent-soft); }
+
+/* 画面がせまいとき、運んでいる間だけ画面の下に出す置き場所 */
+.quick-drop {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; gap: 8px;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: var(--panel);
+  border-top: 1px solid var(--line); box-shadow: 0 -4px 12px rgb(0 0 0 / 0.12);
+}
+.quick-zone {
+  flex: 1; min-height: 56px; display: grid; place-items: center; border: 2px dashed var(--accent);
+  border-radius: 12px; color: var(--accent); font-weight: 700; font-size: 0.95rem;
+}
+.quick-zone.is-over { background: var(--accent-soft); border-style: solid; }
+@media (min-width: 1080px) { .quick-drop { display: none; } }

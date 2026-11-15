@@ -46,36 +46,36 @@ export const wordArea: Problem = {
       "id": "a1",
       "fragmentId": "f3",
       "patternId": "set-variable",
-      "title": "最大値を求めたい量を、$x$ の式で表す",
-      "detail": "面積が何で決まるかを考える。1つの文字 $x$ の式にできれば、関数の最大値の問題になる。"
+      "title": "$x$ の式で表す",
+      "detail": "最大値を求めたい量（面積）を、1つの文字 $x$ の式で表す。そうすれば、関数の最大値の問題になる。"
     },
     {
       "id": "a2",
       "fragmentId": "f3",
       "patternId": "complete-square",
-      "title": "2次式になれば、平方完成で最大値が分かる",
-      "detail": "$x^2$ の係数が負（上に凸）なら、頂点で最大になる。"
+      "title": "平方完成",
+      "detail": "式が2次式になれば、平方完成で最大値が分かる。$x^2$ の係数が負（上に凸）なら、頂点で最大になる。"
     },
     {
       "id": "a3",
       "fragmentId": "f2",
       "patternId": "figure-quantities",
-      "title": "長方形 → 縦と横で決まる。面積は 縦×横",
-      "detail": "縦と横の長さが分かれば、面積が式で書ける。"
+      "title": "縦×横",
+      "detail": "長方形は縦と横で決まる。面積は 縦×横。縦と横の長さが分かれば、面積が式で書ける。"
     },
     {
       "id": "a4",
       "fragmentId": "f1",
       "patternId": "constraint-relation",
-      "title": "針金の長さが一定 → 縦＋横＝$10$",
-      "detail": "周の長さが $20$ なので、縦と横の和は $10$。一方が決まれば、もう一方も決まる。"
+      "title": "縦＋横＝$10$",
+      "detail": "針金の長さが一定なので、周の長さは $20$。縦と横の和は $10$ で、一方が決まれば、もう一方も決まる。"
     },
     {
       "id": "a5",
       "fragmentId": "f1",
       "patternId": "variable-range",
-      "title": "長さは正 → $x$ のとりうる範囲が決まる",
-      "detail": "縦も横も正の数でなければならない。最大値はその範囲の中で考える。"
+      "title": "$x$ の範囲",
+      "detail": "長さは正の数なので、縦も横も正。そこから $x$ のとりうる範囲が決まり、最大値はその範囲の中で考える。"
     }
   ],
   "combinations": [
@@ -85,8 +85,8 @@ export const wordArea: Problem = {
         "a3",
         "a4"
       ],
-      "title": "縦を $x$ とすると、横は $10-x$",
-      "detail": "文字を1つに減らせた。"
+      "title": "縦 $x$、横 $10-x$",
+      "detail": "縦を $x$ とすると、横は $10-x$。文字を1つに減らせた。"
     },
     {
       "id": "c2",
@@ -94,8 +94,8 @@ export const wordArea: Problem = {
         "c1",
         "a1"
       ],
-      "title": "面積は $S=x(10-x)$",
-      "detail": "面積が $x$ の2次式で表せた。",
+      "title": "$S=x(10-x)$",
+      "detail": "面積 $S$ が、$x$ の2次式で表せた。",
       "graph": {
         "expr": "x(10-x)",
         "xMin": -1,

@@ -5,6 +5,8 @@ export interface Settings {
   fontScale: number;
   /** カードを運んでいる間、くっつけられる相手を光らせるか */
   partnerHint: boolean;
+  /** 解答ボードの並びを、模範の骨組みとくらべて確かめる機能を使うか */
+  judge: boolean;
 }
 
 export const FONT_SCALES: { value: number; name: string }[] = [
@@ -14,7 +16,7 @@ export const FONT_SCALES: { value: number; name: string }[] = [
 ];
 
 const KEY = "mathter:settings:v1";
-const DEFAULTS: Settings = { fontScale: 1, partnerHint: false };
+const DEFAULTS: Settings = { fontScale: 1, partnerHint: false, judge: false };
 const listeners = new Set<() => void>();
 let cache: Settings | null = null;
 
@@ -25,6 +27,7 @@ function read(): Settings {
     cache = {
       fontScale: FONT_SCALES.some((f) => f.value === saved.fontScale) ? saved.fontScale! : 1,
       partnerHint: saved.partnerHint === true,
+      judge: saved.judge === true,
     };
   } catch {
     cache = DEFAULTS;

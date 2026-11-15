@@ -68,37 +68,6 @@ export function sourcesOf(problem: Problem, id: string): string[] {
   return combo.from.flatMap((f) => [f, ...sourcesOf(problem, f)]);
 }
 
-/**
- * 解答ボードに置いた考えから、同じ考えの重複・ボードにない考え・
- * くっつけて別の考えに代わったものを取り除く。長さは骨組みの段数にそろえる。
- */
-export function sanitizePlaced(
-  problem: Problem,
-  board: string[],
-  placed: (string | null)[],
-): (string | null)[] {
-  const visible = visibleCards(problem, board);
-  const seen = new Set<string>();
-  return problem.skeleton.map((_, i) => {
-    const id = placed[i] ?? null;
-    if (id === null || !visible.includes(id) || seen.has(id)) return null;
-    seen.add(id);
-    return id;
-  });
-}
-
-export type SlotResult = "empty" | "ok" | "elsewhere" | "needs-merge" | "unused";
-
-/** 解答ボードの index 段目に置いた考えが、その場所に合っているか。 */
-export function checkSlot(problem: Problem, index: number, id: string | null): SlotResult {
-  if (id === null) return "empty";
-  if (problem.skeleton[index]?.thoughts.includes(id)) return "ok";
-  const accepted = problem.skeleton.flatMap((k) => k.thoughts);
-  if (accepted.includes(id)) return "elsewhere";
-  if (accepted.some((t) => sourcesOf(problem, t).includes(id))) return "needs-merge";
-  return "unused";
-}
-
 /** 問題データの参照切れなどを検査する。問題がなければ空配列。 */
 export function validateProblem(problem: Problem): string[] {
   const errors: string[] = [];
@@ -134,7 +103,6 @@ export function validateProblem(problem: Problem): string[] {
       used.add(f);
     }
   }
-  if (problem.skeleton.length === 0) errors.push("skeleton が空");
   const placedOnce = new Set<string>();
   for (const k of problem.skeleton) {
     if (k.thoughts.length === 0) errors.push(`${k.id}: 置ける考えがない`);

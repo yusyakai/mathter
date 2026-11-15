@@ -46,36 +46,36 @@ export const alwaysPositive: Problem = {
       "id": "a1",
       "fragmentId": "f1",
       "patternId": "all-x",
-      "title": "すべての $x$ で成り立つ → グラフ全体で考える",
-      "detail": "1つの $x$ ではなく全部の $x$。$y=x^2+2kx+k+2$ のグラフ全体が条件を満たすかを見る。"
+      "title": "グラフ全体で考える",
+      "detail": "「すべての $x$ で成り立つ」とは、1つの $x$ ではなく全部の $x$ のこと。$y=x^2+2kx+k+2$ のグラフ全体が条件を満たすかを見る。"
     },
     {
       "id": "a2",
       "fragmentId": "f2",
       "patternId": "ineq-sign",
-      "title": "$>0$ → グラフが $x$ 軸より上",
-      "detail": "$y>0$ は、グラフが $x$ 軸より上にあるということ。"
+      "title": "$x$ 軸より上",
+      "detail": "$>0$ は、グラフが $x$ 軸より上にあるということ。"
     },
     {
       "id": "a3",
       "fragmentId": "f2",
       "patternId": "convex",
-      "title": "$x^2$ の係数が正 → 下に凸",
-      "detail": "下に凸なので、頂点が一番低い。頂点さえ $x$ 軸より上なら、全体が上にある。"
+      "title": "下に凸",
+      "detail": "$x^2$ の係数が正なので、グラフは下に凸。頂点が一番低い。頂点さえ $x$ 軸より上なら、全体が上にある。"
     },
     {
       "id": "a4",
       "fragmentId": "f2",
       "patternId": "half-discriminant",
-      "title": "$x$ の係数が $2\\times\\square$ の形 → $\\dfrac{D}{4}$ が使える",
-      "detail": "$x$ の係数が $2k$ なので、$\\dfrac{D}{4}=k^2-1\\cdot(k+2)$。"
+      "title": "$\\dfrac{D}{4}$ を使う",
+      "detail": "$x$ の係数が $2k$（$2\\times\\square$ の形）なので、$\\dfrac{D}{4}=k^2-1\\cdot(k+2)$ で計算が楽になる。"
     },
     {
       "id": "a5",
       "fragmentId": "f3",
       "patternId": "condition-equation",
-      "title": "求めるのは $k$ の範囲 → 条件を $k$ の不等式にする",
-      "detail": "「すべての $x$ で成り立つ」という条件を、$k$ だけの不等式に直す。"
+      "title": "$k$ の不等式にする",
+      "detail": "求めるのは $k$ の範囲。「すべての $x$ で成り立つ」という条件を、$k$ だけの不等式に直す。"
     }
   ],
   "combinations": [
@@ -85,8 +85,8 @@ export const alwaysPositive: Problem = {
         "a1",
         "a2"
       ],
-      "title": "グラフ全体が $x$ 軸より上にある（$x$ 軸と共有点をもたない）",
-      "detail": "どの $x$ でも $y>0$ ということは、グラフが $x$ 軸に触れもしない。",
+      "title": "$x$ 軸と共有点なし",
+      "detail": "グラフ全体が $x$ 軸より上にある。どの $x$ でも $y>0$ ということは、グラフが $x$ 軸に触れもしない。",
       "graph": {
         "expr": "x^2+2kx+k+2",
         "param": {
@@ -107,8 +107,8 @@ export const alwaysPositive: Problem = {
         "c1",
         "a3"
       ],
-      "title": "下に凸で $x$ 軸と共有点なし ⇔ $D<0$",
-      "detail": "下に凸の放物線が $x$ 軸と共有点をもたなければ、全体が上にある。共有点なしは $D<0$。"
+      "title": "$D<0$",
+      "detail": "下に凸の放物線が $x$ 軸と共有点をもたなければ、全体が $x$ 軸より上にある。共有点なしは $D<0$。"
     },
     {
       "id": "c3",
@@ -116,8 +116,8 @@ export const alwaysPositive: Problem = {
         "a4",
         "a5"
       ],
-      "title": "$\\dfrac{D}{4}=k^2-k-2<0$ を、$k$ の不等式として解く",
-      "detail": "$D<0$ は $k$ の2次不等式になる。"
+      "title": "$\\dfrac{D}{4}<0$ を解く",
+      "detail": "$\\dfrac{D}{4}=k^2-k-2$。$D<0$ は、$k$ の2次不等式 $k^2-k-2<0$ になる。"
     }
   ],
   "skeleton": [

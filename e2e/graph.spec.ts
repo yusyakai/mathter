@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { board, boardCard, collect, drag } from "./helpers";
+import { board, boardCard, collect, drag, rows } from "./helpers";
 
 test("考えに付いたグラフが出て、スライダーで動かしてもカードは動かない", async ({ page }) => {
   await page.goto("/#/p/quadratic-min");
-  await collect(page, 0, "平方完成");
-  await collect(page, 1, "文字");
-  await drag(page, boardCard(page, "平方完成"), boardCard(page, "文字"));
+  await collect(page, "f1", "a1");
+  await collect(page, "f2", "a4");
+  await drag(page, boardCard(page, "a1"), boardCard(page, "a4"));
   const graph = board(page).locator(".graph");
   await expect(graph.locator("svg")).toBeVisible();
   await expect(graph.locator(".graph-slider span")).toHaveText("a = 1");
@@ -19,8 +19,8 @@ test("考えに付いたグラフが出て、スライダーで動かしても�
   await page.mouse.up();
   await expect(graph.locator(".graph-slider span")).not.toHaveText("a = 1");
   expect(await graph.locator("path.graph-curve").last().getAttribute("d")).not.toBe(before);
-  await expect(board(page).locator(".card")).toHaveCount(1);
-  await expect(page.locator(".slot .card")).toHaveCount(0);
+  await expect(board(page).locator(".thought")).toHaveCount(1);
+  await expect(rows(page)).toHaveCount(0);
 });
 
 test("作る画面でグラフを付けると、すぐ下に見え方が出て、式の誤りは知らせる", async ({ page }) => {

@@ -6,19 +6,21 @@ import {
   useCustomPatterns,
   useCustomProblems,
 } from "../library";
+import { isComplete } from "../answer";
+import { useSettings } from "../settings";
 import { loadState } from "../storage";
 import { dayKey, formatDuration, totalSeconds, useStudyTime } from "../studyTime";
-import { checkSlot } from "../thoughts";
 import type { Problem } from "../types";
 import { label } from "../editor/draft";
 import { Rich } from "./Rich";
 
 type Status = "new" | "doing" | "done";
 
-function status(problem: Problem): Status {
-  const { board, placed } = loadState(problem);
-  if (board.length === 0) return "new";
-  return placed.every((id, i) => checkSlot(problem, i, id) === "ok") ? "done" : "doing";
+/** judge: 「配置を確かめる」を使う設定か。使わないなら「骨組み完成」は出さない。 */
+function status(problem: Problem, judge: boolean): Status {
+  const { board, rows } = loadState(problem);
+  if (board.length === 0 && rows.length === 0) return "new";
+  return judge && isComplete(problem, rows) ? "done" : "doing";
 }
 
 const STATUS_NAME: Record<Status, string> = {
@@ -41,7 +43,8 @@ export function ProblemList() {
   const usedPatterns = patterns.filter((x) =>
     problems.some((p) => p.associations.some((a) => a.patternId === x.id)),
   );
-  const withStatus = problems.map((p) => ({ p, s: status(p) }));
+  const { judge } = useSettings();
+  const withStatus = problems.map((p) => ({ p, s: status(p, judge) }));
   const shown = withStatus.filter(({ p, s }) => {
     if (unit && p.unit !== unit) return false;
     if (state && s !== state) return false;
@@ -73,11 +76,13 @@ export function ProblemList() {
           onChange={(e) => setState(e.target.value as "" | Status)}
         >
           <option value="">すべての進み具合</option>
-          {(Object.keys(STATUS_NAME) as Status[]).map((s) => (
-            <option key={s} value={s}>
-              {STATUS_NAME[s]}
-            </option>
-          ))}
+          {(Object.keys(STATUS_NAME) as Status[])
+            .filter((s) => judge || s !== "done")
+            .map((s) => (
+              <option key={s} value={s}>
+                {STATUS_NAME[s]}
+              </option>
+            ))}
         </select>
         <select aria-label="型でしぼる" value={pattern} onChange={(e) => setPattern(e.target.value)}>
           <option value="">すべての型</option>

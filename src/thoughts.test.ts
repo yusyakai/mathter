@@ -4,11 +4,8 @@ import { patterns } from "./data/patterns";
 import { problems } from "./data/problems";
 import {
   cardContaining,
-  checkSlot,
   findCombination,
   sanitizeBoard,
-  sanitizePlaced,
-  sourcesOf,
   validateProblem,
   visibleCards,
 } from "./thoughts";
@@ -75,31 +72,6 @@ describe("思考ボード", () => {
   it("壊れた保存データを直す", () => {
     expect(sanitizeBoard(p, ["a1", "zz", "c1", "c3", "a1"])).toEqual(["a1"]);
     expect(sanitizeBoard(p, ["a1", "a4", "c1"])).toEqual(["a1", "a4", "c1"]);
-  });
-});
-
-describe("解答ボード", () => {
-  const p = problems.find((x) => x.id === "quadratic-min")!;
-  it("置いた場所が合っているかが分かる", () => {
-    expect(checkSlot(p, 0, null)).toBe("empty");
-    expect(checkSlot(p, 0, "c1")).toBe("ok");
-    expect(checkSlot(p, 0, "a1")).toBe("ok");
-    expect(checkSlot(p, 1, "c1")).toBe("elsewhere");
-    expect(checkSlot(p, 2, "a3")).toBe("needs-merge");
-  });
-  it("骨組みを上から順に全部うめられる", () => {
-    for (const problem of problems) {
-      const main = problem.skeleton.map((k) => k.thoughts[0]);
-      const board = [...new Set(main.flatMap((t) => [...sourcesOf(problem, t), t]))];
-      expect(sanitizePlaced(problem, board, main)).toEqual(main);
-    }
-  });
-  it("壊れた配置を直す", () => {
-    expect(sanitizePlaced(p, ["a1", "a4", "c1"], ["a1", "c1", "c1", "zz"])).toEqual([
-      null,
-      "c1",
-      null,
-    ]);
   });
 });
 

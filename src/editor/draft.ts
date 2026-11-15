@@ -1,6 +1,7 @@
 import katex from "katex";
 import { prepare } from "../graph/spec";
 import { sourcesOf, validateProblem } from "../thoughts";
+import { mathRanges } from "../words";
 import type {
   Association,
   Combination,
@@ -101,21 +102,6 @@ export function nextId(prefix: string, existing: string[]): string {
   for (let n = 1; ; n++) {
     if (!existing.includes(`${prefix}${n}`)) return `${prefix}${n}`;
   }
-}
-
-/** `$...$` で囲まれた数式の範囲。 */
-export function mathRanges(text: string): [number, number][] {
-  const ranges: [number, number][] = [];
-  let open = -1;
-  for (let i = 0; i < text.length; i++) {
-    if (text[i] !== "$") continue;
-    if (open < 0) open = i;
-    else {
-      ranges.push([open, i + 1]);
-      open = -1;
-    }
-  }
-  return ranges;
 }
 
 /** 選んだ範囲を整える。前後の空白を除き、数式の途中で切れていたら数式全体に広げる。 */
@@ -225,6 +211,23 @@ export function editText(d: Draft, text: string): Draft {
   return next;
 }
 
+/**
+ * カードに出したときの、おおよその長さ（字数）。数式は LaTeX の書き方より短く見えるので、少なめに数える。
+ * 思考ボードには単語や短い文を出したいので、長すぎないかの目安に使う。
+ */
+export function displayLength(text: string): number {
+  let length = 0;
+  let at = 0;
+  for (const [a, b] of mathRanges(text)) {
+    length += text.slice(at, a).trim().length + Math.min(8, Math.ceil((b - a - 2) / 2));
+    at = b;
+  }
+  return length + text.slice(at).trim().length;
+}
+
+/** 思考ボードに出すことばの長さの目安。これを超えると「長めです」と知らせる（直さなくても試せる）。 */
+export const TITLE_GUIDE = 20;
+
 /** 一覧や注意書きに出す短い名前（数式の記号は外す）。 */
 export function label(text: string, max = 18): string {
   const plain = text.replace(/\$/g, "").trim();
@@ -263,6 +266,15 @@ export function issues(d: Draft): Issue[] {
     const problem = mathProblem(text);
     if (problem) add(section, `${where}：${problem}`);
   };
+  const checkLength = (section: Section, title: string) => {
+    if (displayLength(title) > TITLE_GUIDE) {
+      add(
+        section,
+        `「${label(title)}」が長めです。思考ボードには単語や短い文を出し、説明は「くわしい説明」に書くと使いやすくなります（このままでも試せます）。`,
+        false,
+      );
+    }
+  };
   const checkGraph = (section: Section, where: string, graph: GraphSpec | undefined) => {
     if (!graph) return;
     const ready = prepare(graph);
@@ -286,6 +298,7 @@ export function issues(d: Draft): Issue[] {
     for (const a of mine) {
       if (a.title.trim() === "") add("marks", `着眼点「${markText(m.id)}」に、一言が空の連想があります。`);
       checkMath("marks", `連想「${label(a.title)}」`, `${a.title} ${a.detail}`);
+      checkLength("marks", a.title);
       checkGraph("marks", `連想「${label(a.title)}」`, a.graph);
     }
   }
@@ -300,6 +313,7 @@ export function issues(d: Draft): Issue[] {
     else if (c.from[0] === c.from[1]) add("combos", `${name}：もとになる考えは、別々の2つを選んでください。`);
     if (c.title.trim() === "") add("combos", "生まれる考えの一言が空の組み合わせがあります。");
     checkMath("combos", name, `${c.title} ${c.detail}`);
+    checkLength("combos", c.title);
     checkGraph("combos", name, c.graph);
     for (const f of new Set(c.from)) if (f) used.set(f, (used.get(f) ?? 0) + 1);
   }
@@ -318,7 +332,13 @@ export function issues(d: Draft): Issue[] {
   });
   if (looped) add("combos", "組み合わせが輪になっています（自分から生まれた考えを、自分のもとにしています）。");
 
-  if (d.skeleton.length === 0) add("skeleton", "解答の骨組みを1段以上作ってください。");
+  if (d.skeleton.length === 0) {
+    add(
+      "skeleton",
+      "模範の骨組みがありません。設定で「配置を確かめる」を使うときだけ必要です（なくても試せます）。",
+      false,
+    );
+  }
   const placed = new Map<string, number>();
   d.skeleton.forEach((k, i) => {
     if (k.thoughts.length === 0) add("skeleton", `${i + 1}段目に置く考えを選んでください。`);

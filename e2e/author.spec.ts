@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { board, candidate, drag, fragment, turnOnJudge } from "./helpers";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -22,8 +23,8 @@ async function pick(page: Page, part: string, trim = 0): Promise<void> {
   await page.getByText("選んだ部分を着眼点にする").click();
 }
 
-/** 1問を最初から作る。 */
-async function author(page: Page): Promise<void> {
+/** 1問を最初から作る。skeleton が false なら、模範の骨組みは作らない。 */
+async function author(page: Page, skeleton = true): Promise<void> {
   await page.goto("/#/edit");
   await page.getByText("新しい問題を作る").click();
   await expect(page.locator(".editor-bar")).toContainText("あと");
@@ -35,19 +36,21 @@ async function author(page: Page): Promise<void> {
 
   const s3 = step(page, 3);
   await s3.locator(".block").nth(0).getByText("＋ 連想を足す").click();
-  await s3.locator(".block").nth(0).getByPlaceholder(/平方完成/).fill("不等式 → まず $x$ について解く");
+  await s3.locator(".block").nth(0).getByPlaceholder("例：平方完成", { exact: true }).fill("$x$ について解く");
   await s3.locator(".block").nth(1).getByText("＋ 連想を足す").click();
-  await s3.locator(".block").nth(1).getByPlaceholder(/平方完成/).fill("自然数 → 正の整数だけ");
+  await s3.locator(".block").nth(1).getByPlaceholder("例：平方完成", { exact: true }).fill("正の整数");
 
   const s4 = step(page, 4);
   await s4.getByText("＋ 組み合わせを足す").click();
   await s4.locator("select").nth(0).selectOption({ index: 1 });
   await s4.locator("select").nth(1).selectOption({ index: 2 });
-  await s4.getByPlaceholder(/軸は/).fill("解の範囲にある自然数を数え上げる");
+  await s4.getByPlaceholder(/が動く/).fill("範囲の中の自然数");
 
-  const s5 = step(page, 5);
-  await s5.getByText("＋ 段を足す").click();
-  await s5.locator("select").nth(0).selectOption({ label: "解の範囲にある自然数を数え上げる" });
+  if (skeleton) {
+    const s5 = step(page, 5);
+    await s5.getByText("＋ 段を足す").click();
+    await s5.locator("select").nth(0).selectOption({ label: "範囲の中の自然数" });
+  }
 
   const s6 = step(page, 6);
   await s6.getByText("＋ 行を足す").click();
@@ -63,7 +66,8 @@ test("問題を最初から作って、学習画面で試せる", async ({ page 
   await page.locator(".editor-bar a.primary").click();
   await expect(page.locator(".crumb")).toContainText("1次不等式の整数解");
   await expect(page.locator(".problem-text .fragment")).toHaveCount(2);
-  await expect(page.locator(".slot")).toHaveCount(1);
+  await fragment(page, "f1").click();
+  await expect(candidate(page, "a1")).toContainText("について解く");
   await page.goto("/#/");
   await expect(page.locator(".problem-item").first()).toContainText("自作");
 });
@@ -93,6 +97,29 @@ test("骨組みに同時に置けない考えを選ぶと、注意が出る", as
   await expect(page.locator(".editor-bar")).toContainText("あと");
 });
 
+test("模範の骨組みがなくても試せる。その問題では「配置を確かめる」は出ない", async ({ page }) => {
+  await turnOnJudge(page);
+  await author(page, false);
+  await expect(step(page, 5).locator(".issues")).toContainText("なくても試せます");
+  await page.locator(".editor-bar a.primary").click();
+  await fragment(page, "f1").click();
+  await drag(page, candidate(page, "a1").locator(".card-head"), page.locator(".answer-new"));
+  await expect(page.locator(".answer-row")).toHaveCount(1);
+  await expect(page.getByText("配置を確かめる")).toHaveCount(0);
+});
+
+test("長い連想には、直さなくてもよい注意が出る", async ({ page }) => {
+  await author(page);
+  const s3 = step(page, 3);
+  await s3
+    .locator(".block")
+    .nth(0)
+    .getByPlaceholder("例：平方完成", { exact: true })
+    .fill("不等式を見たら、まず文字について解いて、解の範囲を求めることを考える");
+  await expect(s3.locator(".issues li.is-note")).toContainText("長めです");
+  await expect(page.locator(".editor-bar")).toContainText("この問題は試せます");
+});
+
 test("新しい型を作ると、連想ノートに貯まる", async ({ page }) => {
   await author(page);
   const block = step(page, 3).locator(".block").nth(1);
@@ -102,15 +129,8 @@ test("新しい型を作ると、連想ノートに貯まる", async ({ page }) 
   await expect(block.locator("select")).not.toHaveValue("");
 
   await page.locator(".editor-bar a.primary").click();
-  await page.locator(".problem-text .fragment").nth(1).click();
-  const card = page.locator(".panel").first().locator(".card");
-  const a = (await card.boundingBox())!;
-  const b = (await page.locator(".board h2").boundingBox())!;
-  await page.mouse.move(a.x + 30, a.y + 12);
-  await page.mouse.down();
-  await page.mouse.move(a.x + 50, a.y + 30, { steps: 4 });
-  await page.mouse.move(b.x + 40, b.y + 10, { steps: 10 });
-  await page.mouse.up();
+  await fragment(page, "f2").click();
+  await drag(page, candidate(page, "a2").locator(".card-head"), board(page).locator("h2"));
   await page.getByRole("link", { name: "連想ノート" }).click();
   await expect(page.locator(".pattern", { hasText: "「自然数」" })).toHaveCount(1);
 });

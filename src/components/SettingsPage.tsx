@@ -36,6 +36,21 @@ export function SettingsPage({ onCleared }: { onCleared: () => void }) {
         </p>
       </section>
 
+      <h2 className="page-heading">解答ボード</h2>
+      <section className="panel">
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={settings.judge}
+            onChange={(e) => updateSettings({ judge: e.target.checked })}
+          />
+          「配置を確かめる」を使う
+        </label>
+        <p className="guide">
+          入れると、解答ボードに「配置を確かめる」ボタンが出て、並べた順番が模範の骨組みと合っているかを段ごとに確かめられます。切ってあると、自由に並べるだけになります。
+        </p>
+      </section>
+
       <h2 className="page-heading">この端末の記録</h2>
       <section className="panel">
         <p className="guide">

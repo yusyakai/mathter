@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { problems } from "../data/problems";
 import {
+  TITLE_GUIDE,
   addMark,
+  displayLength,
   editText,
   emptyDraft,
   fromProblem,
@@ -64,6 +66,41 @@ describe("問題文を書きかえる", () => {
   it("着眼点を消すと、連想も消える", () => {
     const d = removeMark(base, "f1");
     expect(d.associations.some((a) => a.fragmentId === "f1")).toBe(false);
+  });
+});
+
+describe("直さなくてもよい注意", () => {
+  const base = fromProblem(problems.find((p) => p.id === "quadratic-min")!);
+
+  it("模範の骨組みがなくても試せる（注意だけ出る）", () => {
+    const list = issues({ ...base, skeleton: [] });
+    expect(list.filter((x) => x.blocking)).toEqual([]);
+    expect(list.some((x) => x.section === "skeleton" && x.message.includes("なくても試せます"))).toBe(true);
+  });
+
+  it("連想が長いと、短くするよう知らせる（試すことはできる）", () => {
+    const long = "不等式を見たら、まず文字について解いて、解の範囲を求めることを考える";
+    const d = {
+      ...base,
+      associations: base.associations.map((a) => (a.id === "a1" ? { ...a, title: long } : a)),
+    };
+    const list = issues(d);
+    expect(list.filter((x) => x.blocking)).toEqual([]);
+    expect(list.some((x) => x.message.includes("長めです"))).toBe(true);
+  });
+
+  it("内蔵の問題の連想は、どれも単語や短い文になっている", () => {
+    for (const p of problems) {
+      for (const t of [...p.associations, ...p.combinations]) {
+        expect(displayLength(t.title), `${p.id} ${t.id}「${t.title}」`).toBeLessThanOrEqual(TITLE_GUIDE);
+      }
+    }
+  });
+
+  it("数式は、LaTeX の書き方より短く数える", () => {
+    expect(displayLength("平方完成")).toBe(4);
+    expect(displayLength("$\\dfrac{D}{4}$ を使う")).toBe(3 + 6);
+    expect(displayLength("軸 $x=a$ が動く")).toBe(1 + 2 + 3);
   });
 });
 

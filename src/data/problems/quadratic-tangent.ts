@@ -49,29 +49,29 @@ export const tangent: Problem = {
       "id": "a1",
       "fragmentId": "f2",
       "patternId": "tangent",
-      "title": "接する → 共有点がちょうど1個",
-      "detail": "$x$ 軸と接する ＝ $y=0$ となる $x$ がちょうど1つ（重解）。"
+      "title": "共有点が1個",
+      "detail": "$x$ 軸と接する ＝ 共有点がちょうど1個。$y=0$ となる $x$ がちょうど1つ（重解）。"
     },
     {
       "id": "a2",
       "fragmentId": "f2",
       "patternId": "discriminant",
-      "title": "$x$ 軸との共有点 → 判別式 $D$",
-      "detail": "$x^2-2kx+k+2=0$ の実数解の個数が、共有点の個数。$D$ の符号で分かる。"
+      "title": "判別式 $D$",
+      "detail": "$x$ 軸との共有点の個数は、$x^2-2kx+k+2=0$ の実数解の個数と同じ。判別式 $D$ の符号で分かる。"
     },
     {
       "id": "a3",
       "fragmentId": "f1",
       "patternId": "half-discriminant",
-      "title": "$x$ の係数が $2\\times\\square$ の形 → $\\dfrac{D}{4}$ が使える",
-      "detail": "$x$ の係数が $-2k=2\\times(-k)$ なので、$\\dfrac{D}{4}=(-k)^2-1\\cdot(k+2)$。"
+      "title": "$\\dfrac{D}{4}$ を使う",
+      "detail": "$x$ の係数が $-2k=2\\times(-k)$ の形なので、$\\dfrac{D}{4}=(-k)^2-1\\cdot(k+2)$ で計算が楽になる。"
     },
     {
       "id": "a4",
       "fragmentId": "f3",
       "patternId": "condition-equation",
-      "title": "求めるのは $k$ → 条件を $k$ の方程式にする",
-      "detail": "「接する」という条件を、$k$ だけの式に直せば解ける。"
+      "title": "$k$ の方程式にする",
+      "detail": "求めるのは $k$。「接する」という条件を、$k$ だけの式に直せば解ける。"
     }
   ],
   "combinations": [
@@ -81,8 +81,8 @@ export const tangent: Problem = {
         "a1",
         "a2"
       ],
-      "title": "接する ⇔ $D=0$",
-      "detail": "共有点が1個 ＝ 実数解が1個（重解） ＝ 判別式が $0$。",
+      "title": "$D=0$",
+      "detail": "接する ⇔ 共有点が1個 ⇔ 実数解が1個（重解） ⇔ 判別式が $0$。",
       "graph": {
         "expr": "x^2-2kx+k+2",
         "param": {
@@ -103,8 +103,8 @@ export const tangent: Problem = {
         "a3",
         "a4"
       ],
-      "title": "$\\dfrac{D}{4}=k^2-k-2$ を、$k$ の式として解く",
-      "detail": "$\\dfrac{D}{4}=0$ は $k$ の2次方程式になる。"
+      "title": "$\\dfrac{D}{4}$ を $k$ で表す",
+      "detail": "$\\dfrac{D}{4}=k^2-k-2$。$\\dfrac{D}{4}=0$ は $k$ の2次方程式になる。"
     }
   ],
   "skeleton": [

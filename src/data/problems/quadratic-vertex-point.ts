@@ -49,22 +49,22 @@ export const vertexPoint: Problem = {
       "id": "a1",
       "fragmentId": "f1",
       "patternId": "vertex-form",
-      "title": "頂点が分かっている → $y=a(x-p)^2+q$ とおく",
-      "detail": "頂点が $(1,\\,-2)$ なので $y=a(x-1)^2-2$ とおける。分からないのは $a$ だけ。"
+      "title": "$y=a(x-p)^2+q$ とおく",
+      "detail": "頂点が分かっているときの形。頂点が $(1,\\,-2)$ なので $y=a(x-1)^2-2$ とおける。分からないのは $a$ だけ。"
     },
     {
       "id": "a2",
       "fragmentId": "f2",
       "patternId": "substitute-point",
-      "title": "点を通る → 座標を代入する",
-      "detail": "$x=3$，$y=6$ を式に入れると、$a$ の方程式ができる。"
+      "title": "座標を代入",
+      "detail": "点を通る ＝ その座標を式に入れると成り立つ。$x=3$，$y=6$ を入れると、$a$ の方程式ができる。"
     },
     {
       "id": "a3",
       "fragmentId": "f3",
       "patternId": "set-unknown",
-      "title": "式を求める → 分からない係数を文字でおく",
-      "detail": "文字が少なくなる形を選ぶ。条件の数だけ文字が決まる。"
+      "title": "係数を文字でおく",
+      "detail": "式を求める問題では、分からない係数を文字でおく。文字が少なくなる形を選ぶ。条件の数だけ文字が決まる。"
     }
   ],
   "combinations": [
@@ -74,8 +74,8 @@ export const vertexPoint: Problem = {
         "a3",
         "a1"
       ],
-      "title": "$y=a(x-1)^2-2$ とおく（文字は $a$ の1つだけ）",
-      "detail": "頂点の条件を使い切った形。残りの条件1つで $a$ が決まる。"
+      "title": "$y=a(x-1)^2-2$ とおく",
+      "detail": "頂点の条件を使い切った形。文字は $a$ の1つだけなので、残りの条件1つで $a$ が決まる。"
     }
   ],
   "skeleton": [

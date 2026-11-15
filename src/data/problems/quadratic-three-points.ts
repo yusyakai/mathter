@@ -49,22 +49,22 @@ export const threePoints: Problem = {
       "id": "a1",
       "fragmentId": "f1",
       "patternId": "general-form",
-      "title": "3点を通る → $y=ax^2+bx+c$ とおく",
-      "detail": "頂点も軸も分からないので一般形でおく。文字は3つ、条件も3つ。"
+      "title": "$y=ax^2+bx+c$ とおく",
+      "detail": "3点を通るときは、頂点も軸も分からないので一般形でおく。文字は3つ、条件も3つ。"
     },
     {
       "id": "a2",
       "fragmentId": "f3",
       "patternId": "substitute-point",
-      "title": "点を通る → 座標を代入する",
-      "detail": "3点それぞれの座標を入れると、$a,\\,b,\\,c$ の式が3つできる。"
+      "title": "座標を代入",
+      "detail": "点を通る ＝ その座標を式に入れると成り立つ。3点それぞれの座標を入れると、$a,\\,b,\\,c$ の式が3つできる。"
     },
     {
       "id": "a3",
       "fragmentId": "f2",
       "patternId": "y-intercept",
-      "title": "$x=0$ の点 → $c$ がすぐ分かる",
-      "detail": "$(0,\\,1)$ を代入すると $c=1$。先に使うと、残りは $a,\\,b$ の連立方程式になる。"
+      "title": "$c$ がすぐ分かる",
+      "detail": "$x=0$ の点 $(0,\\,1)$ を代入すると $c=1$。先に使うと、残りは $a,\\,b$ の連立方程式になる。"
     }
   ],
   "combinations": [
@@ -74,8 +74,8 @@ export const threePoints: Problem = {
         "a2",
         "a3"
       ],
-      "title": "$c=1$ を先に決めてから、残り2点で $a,\\,b$ の連立方程式を解く",
-      "detail": "3つの式を同時に解くより、すぐ決まる文字から片づけるほうが楽。"
+      "title": "$c$ を決めてから連立方程式",
+      "detail": "$c=1$ を先に決めてから、残り2点で $a,\\,b$ の連立方程式を解く。3つの式を同時に解くより、すぐ決まる文字から片づけるほうが楽。"
     }
   ],
   "skeleton": [

@@ -182,6 +182,7 @@ export function Editor({ problem }: { problem: Problem }) {
                 highlighted={[]}
                 onSelect={() => {}}
                 onMiss={() => {}}
+                preview
               />
             </div>
           </>
@@ -191,7 +192,7 @@ export function Editor({ problem }: { problem: Problem }) {
 
       <Step number={3} title="着眼点ごとの連想">
         <p className="guide">
-          上から順に「見る順番」になります。それぞれの着眼点に、連想を1〜3つ入れます。
+          上から順に「見る順番」になります。それぞれの着眼点に、連想を1〜3つ入れます。連想は、そのまま解答ボードに置けるように、単語や短い文にします。理由や使い方は「くわしい説明」に書きます。
         </p>
         {draft.marks.length === 0 && <p className="guide">まだ着眼点がありません。2 で作ってください。</p>}
         {draft.marks.map((m, i) => {
@@ -258,7 +259,7 @@ export function Editor({ problem }: { problem: Problem }) {
                     {newPattern?.for === a.id && (
                       <div className="new-pattern">
                         <p className="guide">
-                          型は、別の問題でも使える「何を見たら → 何を連想するか」です。下の「連想の一言」と「考える内容」が、そのまま型の中身になります。この問題だけの数値は入れないようにします。
+                          型は、別の問題でも使える「何を見たら → 何を連想するか」です。下の「連想」と「くわしい説明」が、そのまま型の中身になります。この問題だけの数値は入れないようにします。
                         </p>
                         <TextField
                           label="きっかけ（何を見たら）"
@@ -290,22 +291,22 @@ export function Editor({ problem }: { problem: Problem }) {
                           </button>
                         </span>
                         {a.title.trim() === "" && (
-                          <p className="guide">先に、下の「連想の一言」を入れてください。</p>
+                          <p className="guide">先に、下の「連想」を入れてください。</p>
                         )}
                       </div>
                     )}
                     <TextField
-                      label="連想の一言（カードに出る）"
+                      label="連想（単語や短い文。思考ボードのカードに出る）"
                       value={a.title}
-                      placeholder="例：平方完成して、頂点と軸を調べる"
+                      placeholder="例：平方完成"
                       onChange={(title) => set({ title })}
                     />
                     <TextField
-                      label="考える内容（「くわしく」で開く）"
+                      label="くわしい説明（カードをタップすると開く）"
                       rows={2}
                       tools
                       value={a.detail}
-                      placeholder="なぜそう考えるか、どう使うか"
+                      placeholder="例：平方完成すると、頂点と軸が分かる"
                       onChange={(detail) => set({ detail })}
                     />
                     <GraphEditor value={a.graph} onChange={(graph) => set({ graph })} />
@@ -376,13 +377,13 @@ export function Editor({ problem }: { problem: Problem }) {
                 ))}
               </div>
               <TextField
-                label="生まれる考えの一言"
+                label="生まれる考え（単語や短い文）"
                 value={c.title}
-                placeholder="例：軸は $x=a$。$a$ によって放物線が左右に動く"
+                placeholder="例：軸 $x=a$ が動く"
                 onChange={(title) => set({ title })}
               />
               <TextField
-                label="考える内容"
+                label="くわしい説明"
                 rows={2}
                 tools
                 value={c.detail}
@@ -412,9 +413,9 @@ export function Editor({ problem }: { problem: Problem }) {
         {notes("combos")}
       </Step>
 
-      <Step number={5} title="解答の骨組み">
+      <Step number={5} title="模範の骨組み（なくてもよい）">
         <p className="guide">
-          解答ボードに、上から順に置く考えを選びます。最初にすることが1段目です。くっつける前の考えを置いても合っている扱いにしたいときは、「これでもよい」に選びます。
+          設定で「配置を確かめる」を使うときに、生徒の並べ方とくらべる模範です。使わないなら、空のままで構いません。解答で使う考えを、使う順に上から選びます。くっつける前の考えでも合っている扱いにしたいときは、「これでもよい」に選びます。
         </p>
         {draft.skeleton.map((k, i) => {
           const setThoughts = (next: string[]) =>
@@ -440,7 +441,7 @@ export function Editor({ problem }: { problem: Problem }) {
               </div>
               <div className="pair">
                 <label className="field">
-                  <span className="field-label">ここに置く考え</span>
+                  <span className="field-label">この段で使う考え</span>
                   <select
                     value={k.thoughts[0] ?? ""}
                     onChange={(e) =>

@@ -49,22 +49,22 @@ export const movingDomain: Problem = {
       "id": "a1",
       "fragmentId": "f1",
       "patternId": "complete-square",
-      "title": "平方完成して、頂点と軸を調べる",
-      "detail": "$y=(x-1)^2+2$ と変形できる。頂点は $(1,\\,2)$、軸は $x=1$。式に文字がないので、グラフは動かない。"
+      "title": "平方完成",
+      "detail": "平方完成すると、頂点と軸が分かる。$y=(x-1)^2+2$ なので、頂点は $(1,\\,2)$、軸は $x=1$。式に文字がないので、グラフは動かない。"
     },
     {
       "id": "a2",
       "fragmentId": "f1",
       "patternId": "convex",
-      "title": "$x^2$ の係数が正 → 下に凸",
-      "detail": "下に凸なので、頂点が一番低い。"
+      "title": "下に凸",
+      "detail": "$x^2$ の係数が正なので、グラフは下に凸。頂点が一番低い。"
     },
     {
       "id": "a3",
       "fragmentId": "f2",
       "patternId": "domain-moves",
-      "title": "定義域に文字 → 区間の右端が $a$ で動く",
-      "detail": "左端は $x=0$ のまま、右端 $x=a$ だけが動く。$a$ が小さいと頂点まで届かない。",
+      "title": "右端 $x=a$ が動く",
+      "detail": "定義域に文字があるので、区間のほうが動く。左端は $x=0$ のまま、右端 $x=a$ だけが動く。$a$ が小さいと頂点まで届かない。",
       "graph": {
         "expr": "x^2-2x+3",
         "param": {
@@ -87,8 +87,8 @@ export const movingDomain: Problem = {
       "id": "a4",
       "fragmentId": "f3",
       "patternId": "extreme-candidates",
-      "title": "最小値の候補は「頂点」か「端点」",
-      "detail": "頂点が使えるかどうかを、まず確かめる。"
+      "title": "頂点か端点",
+      "detail": "最小値の候補は頂点か端点。頂点が使えるかどうかを、まず確かめる。"
     }
   ],
   "combinations": [
@@ -98,8 +98,8 @@ export const movingDomain: Problem = {
         "a2",
         "a4"
       ],
-      "title": "頂点が定義域に入っていれば頂点で最小。入っていなければ軸に近い端点",
-      "detail": "下に凸なので、頂点が使えるなら頂点が最小。使えないなら、軸に一番近い端点が最も低い。"
+      "title": "頂点か、軸に近い端点",
+      "detail": "下に凸なので、頂点が定義域に入っていれば頂点で最小。入っていなければ、軸に一番近い端点が最も低い。"
     },
     {
       "id": "c2",
@@ -107,8 +107,8 @@ export const movingDomain: Problem = {
         "a3",
         "c1"
       ],
-      "title": "軸 $x=1$ が区間 $0\\le x\\le a$ に入るかどうかで場合分け",
-      "detail": "右端 $a$ が $1$ に届かない（$a<1$）か、届く（$a\\ge 1$）かで分ける。"
+      "title": "軸が区間に入るかで場合分け",
+      "detail": "軸 $x=1$ が区間 $0\\le x\\le a$ に入るかどうかで分ける。右端 $a$ が $1$ に届かない（$a<1$）か、届く（$a\\ge 1$）か。"
     }
   ],
   "skeleton": [
