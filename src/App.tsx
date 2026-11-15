@@ -3,6 +3,7 @@ import { Editor } from "./components/Editor";
 import { MyProblems } from "./components/MyProblems";
 import { Notebook } from "./components/Notebook";
 import { ProblemList } from "./components/ProblemList";
+import { SettingsPage } from "./components/SettingsPage";
 import { Workspace } from "./components/Workspace";
 import { playableProblems, useCustomProblems } from "./library";
 import { loadRecord, saveRecord, type LearnerRecord } from "./storage";
@@ -42,6 +43,7 @@ export function App() {
     : undefined;
   const isNote = hash === "#/note";
   const isEdit = hash.startsWith("#/edit");
+  const isSettings = hash === "#/settings";
   const editing = hash.startsWith("#/edit/")
     ? custom.find((p) => p.id === decodeURIComponent(hash.slice(7)))
     : undefined;
@@ -53,7 +55,7 @@ export function App() {
           <a href="#/">mathter</a>
         </h1>
         <nav className="nav">
-          <a href="#/" aria-current={!problem && !isNote && !isEdit ? "page" : undefined}>
+          <a href="#/" aria-current={!problem && !isNote && !isEdit && !isSettings ? "page" : undefined}>
             問題
           </a>
           <a href="#/note" aria-current={isNote ? "page" : undefined}>
@@ -61,6 +63,9 @@ export function App() {
           </a>
           <a href="#/edit" aria-current={isEdit ? "page" : undefined}>
             問題を作る
+          </a>
+          <a href="#/settings" aria-current={isSettings ? "page" : undefined}>
+            設定
           </a>
         </nav>
       </header>
@@ -86,6 +91,8 @@ export function App() {
         <Editor key={editing.id} problem={editing} />
       ) : isEdit ? (
         <MyProblems />
+      ) : isSettings ? (
+        <SettingsPage onCleared={() => setRecord({ seen: [], known: [] })} />
       ) : isNote ? (
         <Notebook record={record} onToggleKnown={toggleKnown} />
       ) : (

@@ -14,7 +14,7 @@
 - ドラッグ＆ドロップは @dnd-kit/core（マウス・タッチ長押し・キーボード）
 - 通信なしでも使える。ビルドの最後に `vite.config.ts` が `dist/sw.js` を作り、アプリ本体を端末に保存する（開発サーバーでは無効）
 - 学習の状態（ボード、型の記録）と自作の問題は端末内（localStorage）にのみ保存する。自作の問題と自作の型はファイル（JSON）に書き出し・読み込みできる
-- 画面の切り替えは URL の `#`（`#/` 一覧、`#/p/問題id`、`#/note` 連想ノート、`#/edit` 自作の問題の一覧、`#/edit/問題id` 問題を作る画面）
+- 画面の切り替えは URL の `#`（`#/` 一覧、`#/p/問題id`、`#/note` 連想ノート、`#/edit` 自作の問題の一覧、`#/edit/問題id` 問題を作る画面、`#/settings` 設定）
 
 ## コマンド
 
@@ -36,12 +36,13 @@ GitHub Pages（`https://yusyakai.github.io/mathter/`）。`.github/workflows/dep
 - `src/thoughts.ts` 考えの組み合わせ、解答ボードの判定、問題データ検査のロジック（画面に依存しない）
 - `src/graph/` グラフのロジック（`expr.ts` 式の読み取りと計算、`spec.ts` 設定の確認と範囲の計算）
 - `src/storage.ts` 学習の状態の保存と読み込み
+- `src/settings.ts` 表示の設定（文字の大きさ、くっつけられる相手を光らせるか）
 - `src/library.ts` 自作の問題・自作の型の保存、書き出しファイルの形、学習画面で使える問題の一覧（内蔵＋自作）
 - `src/editor/ai.ts` AIの下書き（指示文を作る、AIの返事を下書きに直す）。アプリからAIは呼ばず、利用者が手元のAIチャットに貼って使う
 - `src/editor/draft.ts` 問題を作る画面のロジック（下書き ⇔ 問題データの変換、着眼点の位置合わせ、直すことの一覧。画面に依存しない）
 - `src/components/Workspace.tsx` 学習画面。「問題 → 思考ボード → 解答ボード（下に模範解答）」を並べる
 - `src/components/ProblemText.tsx` 問題文と着眼点の表示
-- `src/components/ProblemList.tsx` 問題一覧
+- `src/components/ProblemList.tsx` 問題一覧（単元・進み具合・型・ことばでしぼりこみ）、`SettingsPage.tsx` 設定
 - `src/components/Notebook.tsx` 連想ノート（集めた型の一覧）
 - `src/components/Editor.tsx` 問題を作る画面、`MyProblems.tsx` 自作の問題の一覧、`TextField.tsx` 数式の見え方つきの入力欄
 - `src/components/Graph.tsx` 考えに付けるグラフ（文字をスライダーで動かせる）、`GraphEditor.tsx` その入力欄
@@ -49,7 +50,7 @@ GitHub Pages（`https://yusyakai.github.io/mathter/`）。`.github/workflows/dep
 ## 設計方針
 
 - 答えを教えるのではなく、着眼点と連想を見せ、解答の骨組みを作るところまでを扱う
-- 連想やくっつけ方に正誤は付けない。解答ボードの配置だけ、学習者が「配置を確かめる」を押したときに合っているかを返す
+- 連想やくっつけ方に正誤は付けない。くっつけられる相手の手がかりは、設定で選んだときだけ出す（初期設定は出さない）。解答ボードの配置だけ、学習者が「配置を確かめる」を押したときに合っているかを返す
 - ヒントを決まった順に出さない。どこを見るか、どれを開くかは学習者が選ぶ
 - 問題文には最初から色を付けない。どこに目をつけるかも学習の対象で、着眼点には見る順番（priority）があるが、学習者が「見る順番を表示」を押したときだけ見せる
 - 連想はドラッグして思考ボードに集め、カード同士を重ねてくっつける。くっつけた2枚は新しい考え1枚に代わる

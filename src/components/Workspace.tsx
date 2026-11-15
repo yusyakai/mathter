@@ -20,6 +20,7 @@ import {
   findCombination,
   visibleCards,
 } from "../thoughts";
+import { useSettings } from "../settings";
 import { loadState, saveState, type Saved } from "../storage";
 import type { SlotResult } from "../thoughts";
 import type { Problem, Thought } from "../types";
@@ -67,6 +68,7 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
   const [problemMessage, setProblemMessage] = useState<string | null>(null);
   const [boardMessage, setBoardMessage] = useState<string | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
+  const { partnerHint } = useSettings();
 
   useEffect(() => saveState(problem.id, saved), [problem.id, saved]);
 
@@ -150,6 +152,14 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
     ? step.fromThoughts.flatMap((t) => cardContaining(problem, board, t) ?? [])
     : [];
   const draggingThought = dragging ? thoughts.get(dragging) : undefined;
+  // 設定で選んだときだけ、運んでいるカードとくっつけられる相手を光らせる
+  const partners =
+    partnerHint && dragging
+      ? cards.filter((id) => {
+          const combo = id !== dragging ? findCombination(problem, dragging, id) : undefined;
+          return combo !== undefined && !board.includes(combo.id);
+        })
+      : [];
 
   return (
     <DndContext
@@ -235,6 +245,7 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
                     thought={t}
                     known={isKnown(id)}
                     onToggleKnown={toggleKnownOf(id)}
+                    partner={partners.includes(id)}
                     onBoard
                     highlighted={stepCards.includes(id)}
                     open={opened.includes(id)}
@@ -456,6 +467,8 @@ interface CardProps {
   sources?: string[];
   onRemove?: () => void;
   removeLabel?: string;
+  /** 運んでいるカードとくっつけられる相手か（設定で光らせるとき） */
+  partner?: boolean;
   /** この連想の型に「もう分かる」の印が付いているか */
   known?: boolean;
   onToggleKnown?: () => void;
@@ -473,6 +486,7 @@ function Card({
   removeLabel,
   known,
   onToggleKnown,
+  partner,
 }: CardProps) {
   const drag = useDraggable({ id: thought.id, disabled: placed });
   const drop = useDroppable({ id: thought.id, disabled: !onBoard });
@@ -489,6 +503,7 @@ function Card({
         placed ? "is-placed" : "is-draggable",
         thought.kind === "combination" ? "is-combination" : "",
         known ? "is-known" : "",
+        partner ? "is-partner" : "",
         drag.isDragging ? "is-dragging" : "",
         isTarget ? "is-target" : "",
         highlighted ? "is-highlighted" : "",
