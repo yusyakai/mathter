@@ -1,0 +1,12 @@
+{
+  "name": "mathter",
+  "short_name": "mathter",
+  "description": "問題文から何を連想するかを身に付ける数学アプリ",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#1d5fd0",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
