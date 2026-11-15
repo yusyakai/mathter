@@ -225,3 +225,29 @@ li.problem-item:hover { border-color: var(--line); }
   width: 100%; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px;
   background: var(--bg); color: var(--text); font-family: ui-monospace, monospace; font-size: 0.75rem; line-height: 1.5;
 }
+
+/* グラフ */
+.graph { margin-top: 8px; touch-action: pan-y; }
+.graph svg { display: block; width: 100%; max-width: 360px; height: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.graph-grid { stroke: var(--line); stroke-width: 0.5; opacity: 0.6; }
+.graph-axis { stroke: var(--text); stroke-width: 1; }
+.graph-label { fill: var(--muted); font-size: 9px; font-family: inherit; }
+.graph-curve { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; }
+.graph-curve.is-faint { stroke-width: 1.2; opacity: 0.4; stroke-dasharray: 4 3; }
+.graph-dot { fill: var(--accent); }
+.graph-slider { display: flex; align-items: center; gap: 10px; max-width: 360px; margin-top: 4px; font-size: 0.9rem; }
+.graph-slider span { min-width: 5.5em; font-variant-numeric: tabular-nums; }
+.graph-slider input { flex: 1; min-width: 0; accent-color: var(--accent); }
+.graph-error { margin: 6px 0; font-size: 0.85rem; color: #8a1c14; }
+@media (prefers-color-scheme: dark) { .graph-error { color: #ffb4ab; } }
+.graph-editor { margin: 4px 0 10px; padding: 8px 12px; border: 1px dashed var(--line); border-radius: 10px; }
+.quad { display: grid; gap: 0 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 620px) { .quad { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.check { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 0.9rem; }
+
+/* 横3列のとき、思考ボードが長くなっても問題と解答ボードが画面に残るようにする */
+@media (min-width: 1080px) {
+  .workspace > .panel:not(.board) {
+    position: sticky; top: 8px; max-height: calc(100vh - 16px); overflow-y: auto;
+  }
+}

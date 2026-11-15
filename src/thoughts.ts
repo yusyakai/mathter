@@ -1,3 +1,4 @@
+import { prepare } from "./graph/spec";
 import type { Combination, Problem, Thought } from "./types";
 
 export function allThoughts(problem: Problem): Map<string, Thought> {
@@ -159,6 +160,11 @@ export function validateProblem(problem: Problem): string[] {
     for (const t of s.fromThoughts) {
       if (!thoughtIds.has(t)) errors.push(`${s.id}: 考え ${t} がない`);
     }
+  }
+  for (const t of [...problem.associations, ...problem.combinations]) {
+    if (!t.graph) continue;
+    const ready = prepare(t.graph);
+    if ("error" in ready) errors.push(`${t.id}: ${ready.error}`);
   }
   const texts = [
     ...problem.segments.map((s) => s.text),

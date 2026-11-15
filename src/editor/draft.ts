@@ -1,6 +1,14 @@
 import katex from "katex";
+import { prepare } from "../graph/spec";
 import { sourcesOf, validateProblem } from "../thoughts";
-import type { Association, Combination, Problem, SkeletonStep, SolutionStep } from "../types";
+import type {
+  Association,
+  Combination,
+  GraphSpec,
+  Problem,
+  SkeletonStep,
+  SolutionStep,
+} from "../types";
 
 /** 問題文の中の着眼点の位置（文字数で数えた始まりと終わり）。 */
 export interface Mark {
@@ -255,6 +263,11 @@ export function issues(d: Draft): Issue[] {
     const problem = mathProblem(text);
     if (problem) add(section, `${where}：${problem}`);
   };
+  const checkGraph = (section: Section, where: string, graph: GraphSpec | undefined) => {
+    if (!graph) return;
+    const ready = prepare(graph);
+    if ("error" in ready) add(section, `${where}：${ready.error}`);
+  };
   const markText = (id: string) => label(d.text.slice(...range(d, id)));
 
   if (d.title.trim() === "") add("basic", "タイトルを入れてください。");
@@ -273,6 +286,7 @@ export function issues(d: Draft): Issue[] {
     for (const a of mine) {
       if (a.title.trim() === "") add("marks", `着眼点「${markText(m.id)}」に、一言が空の連想があります。`);
       checkMath("marks", `連想「${label(a.title)}」`, `${a.title} ${a.detail}`);
+      checkGraph("marks", `連想「${label(a.title)}」`, a.graph);
     }
   }
 
@@ -286,6 +300,7 @@ export function issues(d: Draft): Issue[] {
     else if (c.from[0] === c.from[1]) add("combos", `${name}：もとになる考えは、別々の2つを選んでください。`);
     if (c.title.trim() === "") add("combos", "生まれる考えの一言が空の組み合わせがあります。");
     checkMath("combos", name, `${c.title} ${c.detail}`);
+    checkGraph("combos", name, c.graph);
     for (const f of new Set(c.from)) if (f) used.set(f, (used.get(f) ?? 0) + 1);
   }
   for (const [id, n] of used) {

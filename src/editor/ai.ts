@@ -1,5 +1,5 @@
 import { snapSelection, type Draft, type Mark } from "./draft";
-import type { Pattern, Problem } from "../types";
+import type { GraphSpec, Pattern, Problem } from "../types";
 
 /**
  * AIに作らせる下書きの形。問題データそのものより単純にして、
@@ -10,8 +10,15 @@ interface AiDraft {
   unit: string;
   text: string;
   marks: string[];
-  associations: { key: string; mark: string; pattern: string | null; title: string; detail: string }[];
-  combinations: { key: string; from: string[]; title: string; detail: string }[];
+  associations: {
+    key: string;
+    mark: string;
+    pattern: string | null;
+    title: string;
+    detail: string;
+    graph?: GraphSpec;
+  }[];
+  combinations: { key: string; from: string[]; title: string; detail: string; graph?: GraphSpec }[];
   skeleton: string[][];
   solution: { text: string; marks: string[]; thoughts: string[] }[];
 }
@@ -34,12 +41,14 @@ export function toAiDraft(p: Problem): AiDraft {
       pattern: a.patternId ?? null,
       title: a.title,
       detail: a.detail,
+      ...(a.graph ? { graph: a.graph } : {}),
     })),
     combinations: p.combinations.map((c) => ({
       key: k(c.id),
       from: c.from.map(k),
       title: c.title,
       detail: c.detail,
+      ...(c.graph ? { graph: c.graph } : {}),
     })),
     skeleton: p.skeleton.map((s) => s.thoughts.map(k)),
     solution: p.solution.map((s) => ({
@@ -82,6 +91,11 @@ mathter は「問題文のどこに目をつけ、そこから何を連想し、
   - key: "C1" "C2" … の名前
   - from: もとになる2つの考えの key（連想でも、別の組み合わせでもよい）
   - title, detail: 連想と同じ
+- 連想や組み合わせには、グラフを見せると分かりやすいときだけ graph を付けられる（なくてよい）
+  - expr: y = の右側の式（例："x^2-2ax+3"。LaTeX ではなく、^ と括弧で書く）
+  - xMin, xMax: 横の範囲。yMin, yMax: 縦の範囲（省ける）
+  - param: 式の中の文字を生徒が動かせるようにするとき {"name": "a", "min": -1, "max": 3, "value": 1}
+  - domain: 定義域を太く描くとき ["0", "2"]（数か、param の文字で書く）
 - skeleton: 解答の骨組み。解答で使う考えを、使う順に上から並べる。2〜4段。各段は key の配列で、1つ目がその段に置く考え。くっつける前の考えでもよい場合だけ2つ目に書く
 - solution: 模範解答。1行ずつ
   - text: 解答の文
@@ -130,6 +144,26 @@ const str = (x: unknown) => (typeof x === "string" ? x : "");
 const arr = (x: unknown): unknown[] => (Array.isArray(x) ? x : []);
 const obj = (x: unknown): Record<string, unknown> =>
   typeof x === "object" && x !== null ? (x as Record<string, unknown>) : {};
+
+/** グラフの設定を読む。数でない所は捨て、式がなければグラフなしにする。 */
+function readGraph(value: unknown): GraphSpec | undefined {
+  const g = obj(value);
+  const n = (x: unknown) => (typeof x === "number" && Number.isFinite(x) ? x : undefined);
+  if (str(g.expr).trim() === "") return undefined;
+  const p = obj(g.param);
+  const [pMin, pMax, pValue] = [n(p.min), n(p.max), n(p.value)];
+  const d = arr(g.domain).map((x) => (typeof x === "number" ? String(x) : str(x)));
+  return {
+    expr: str(g.expr),
+    xMin: n(g.xMin) ?? -5,
+    xMax: n(g.xMax) ?? 5,
+    ...(n(g.yMin) !== undefined && n(g.yMax) !== undefined ? { yMin: n(g.yMin), yMax: n(g.yMax) } : {}),
+    ...(str(p.name) && pMin !== undefined && pMax !== undefined
+      ? { param: { name: str(p.name), min: pMin, max: pMax, value: pValue ?? pMin } }
+      : {}),
+    ...(d.length === 2 && d.every((x) => x !== "") ? { domain: [d[0], d[1]] as [string, string] } : {}),
+  };
+}
 
 /**
  * AIの下書きを、問題を作る画面の下書きに直す。
@@ -180,12 +214,14 @@ export function fromAiDraft(
     const aid = `a${associations.length + 1}`;
     if (str(a.key)) keyId.set(str(a.key), aid);
     const patternId = patternIds.has(str(a.pattern)) ? str(a.pattern) : undefined;
+    const graph = readGraph(a.graph);
     associations.push({
       id: aid,
       fragmentId,
       ...(patternId ? { patternId } : {}),
       title: str(a.title),
       detail: str(a.detail),
+      ...(graph ? { graph } : {}),
     });
   }
 
@@ -196,11 +232,13 @@ export function fromAiDraft(
   const ref = (x: unknown) => keyId.get(str(x)) ?? "";
   const combinations: Draft["combinations"] = rawCombos.map((c, i) => {
     const from = arr(c.from);
+    const graph = readGraph(c.graph);
     return {
       id: `c${i + 1}`,
       from: [ref(from[0]), ref(from[1])],
       title: str(c.title),
       detail: str(c.detail),
+      ...(graph ? { graph } : {}),
     };
   });
 

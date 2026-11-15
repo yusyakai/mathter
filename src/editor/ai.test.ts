@@ -13,6 +13,8 @@ describe("AIの下書き", () => {
     const made = toProblem(back.draft);
     expect(made.segments.map((s) => s.text)).toEqual(p.segments.map((s) => s.text));
     expect(made.associations.map((a) => a.title)).toEqual(p.associations.map((a) => a.title));
+    expect(made.combinations.map((c) => c.graph)).toEqual(p.combinations.map((c) => c.graph));
+    expect(made.associations.map((a) => a.graph)).toEqual(p.associations.map((a) => a.graph));
     expect(made.skeleton.length).toBe(p.skeleton.length);
     expect(made.solution.length).toBe(p.solution.length);
   });

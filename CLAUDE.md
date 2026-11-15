@@ -33,6 +33,7 @@ GitHub Pages（`https://yusyakai.github.io/mathter/`）。`.github/workflows/dep
 - `src/data/patterns.ts` 連想の型（問題をまたいで共通の「きっかけ → 連想」）
 - `src/data/problems/` 内蔵する問題（1問1ファイル、`index.ts` に登録）
 - `src/thoughts.ts` 考えの組み合わせ、解答ボードの判定、問題データ検査のロジック（画面に依存しない）
+- `src/graph/` グラフのロジック（`expr.ts` 式の読み取りと計算、`spec.ts` 設定の確認と範囲の計算）
 - `src/storage.ts` 学習の状態の保存と読み込み
 - `src/library.ts` 自作の問題・自作の型の保存、書き出しファイルの形、学習画面で使える問題の一覧（内蔵＋自作）
 - `src/editor/ai.ts` AIの下書き（指示文を作る、AIの返事を下書きに直す）。アプリからAIは呼ばず、利用者が手元のAIチャットに貼って使う
@@ -42,6 +43,7 @@ GitHub Pages（`https://yusyakai.github.io/mathter/`）。`.github/workflows/dep
 - `src/components/ProblemList.tsx` 問題一覧
 - `src/components/Notebook.tsx` 連想ノート（集めた型の一覧）
 - `src/components/Editor.tsx` 問題を作る画面、`MyProblems.tsx` 自作の問題の一覧、`TextField.tsx` 数式の見え方つきの入力欄
+- `src/components/Graph.tsx` 考えに付けるグラフ（文字をスライダーで動かせる）、`GraphEditor.tsx` その入力欄
 
 ## 設計方針
 

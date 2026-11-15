@@ -95,7 +95,18 @@ export const wordArea: Problem = {
         "a1"
       ],
       "title": "面積は $S=x(10-x)$",
-      "detail": "面積が $x$ の2次式で表せた。"
+      "detail": "面積が $x$ の2次式で表せた。",
+      "graph": {
+        "expr": "x(10-x)",
+        "xMin": -1,
+        "xMax": 11,
+        "yMin": -5,
+        "yMax": 30,
+        "domain": [
+          "0",
+          "10"
+        ]
+      }
     }
   ],
   "skeleton": [

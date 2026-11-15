@@ -64,7 +64,24 @@ export const movingDomain: Problem = {
       "fragmentId": "f2",
       "patternId": "domain-moves",
       "title": "定義域に文字 → 区間の右端が $a$ で動く",
-      "detail": "左端は $x=0$ のまま、右端 $x=a$ だけが動く。$a$ が小さいと頂点まで届かない。"
+      "detail": "左端は $x=0$ のまま、右端 $x=a$ だけが動く。$a$ が小さいと頂点まで届かない。",
+      "graph": {
+        "expr": "x^2-2x+3",
+        "param": {
+          "name": "a",
+          "min": 0.2,
+          "max": 3,
+          "value": 0.6
+        },
+        "xMin": -1,
+        "xMax": 4,
+        "yMin": 0,
+        "yMax": 8,
+        "domain": [
+          "0",
+          "a"
+        ]
+      }
     },
     {
       "id": "a4",

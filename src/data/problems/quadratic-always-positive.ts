@@ -86,7 +86,20 @@ export const alwaysPositive: Problem = {
         "a2"
       ],
       "title": "グラフ全体が $x$ 軸より上にある（$x$ 軸と共有点をもたない）",
-      "detail": "どの $x$ でも $y>0$ ということは、グラフが $x$ 軸に触れもしない。"
+      "detail": "どの $x$ でも $y>0$ ということは、グラフが $x$ 軸に触れもしない。",
+      "graph": {
+        "expr": "x^2+2kx+k+2",
+        "param": {
+          "name": "k",
+          "min": -2,
+          "max": 3,
+          "value": 0.5
+        },
+        "xMin": -5,
+        "xMax": 4,
+        "yMin": -4,
+        "yMax": 10
+      }
     },
     {
       "id": "c2",

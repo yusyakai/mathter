@@ -7,6 +7,21 @@ export interface TextSegment {
   fragmentId?: string;
 }
 
+/** 考えに付けるグラフ。y = expr を描き、文字（param）があればスライダーで動かせる。 */
+export interface GraphSpec {
+  /** y = の右側の式。x と、動かす文字1つまでを使える（例："x^2-2ax+3"） */
+  expr: string;
+  /** 式に含まれる文字。生徒がスライダーで動かす */
+  param?: { name: string; min: number; max: number; value: number };
+  xMin: number;
+  xMax: number;
+  /** 縦の範囲。省くと自動 */
+  yMin?: number;
+  yMax?: number;
+  /** 定義域（太く描く範囲）の左端と右端。数か、動かす文字で書く（例：["0", "a"]） */
+  domain?: [string, string];
+}
+
 /** 着眼点（問題文の一部分）から連想すること。 */
 export interface Association {
   id: string;
@@ -17,6 +32,8 @@ export interface Association {
   title: RichText;
   /** 思考する内容（なぜそう考えるか、どう使うか） */
   detail: RichText;
+  /** 「くわしく」で一緒に見せるグラフ */
+  graph?: GraphSpec;
 }
 
 /**
@@ -28,6 +45,7 @@ export interface Combination {
   from: [string, string];
   title: RichText;
   detail: RichText;
+  graph?: GraphSpec;
 }
 
 /** 模範解答の1行と、その行が生まれた元（問題文の着眼点と考え）。 */

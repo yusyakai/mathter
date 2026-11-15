@@ -23,6 +23,7 @@ import {
 import { loadState, saveState, type Saved } from "../storage";
 import type { SlotResult } from "../thoughts";
 import type { Problem, Thought } from "../types";
+import { Graph } from "./Graph";
 import { ProblemText } from "./ProblemText";
 import { Rich } from "./Rich";
 
@@ -514,6 +515,7 @@ function Card({
       {open && (
         <div className="card-detail">
           <Rich text={thought.detail} />
+          {thought.graph && <Graph spec={thought.graph} />}
           {onToggleKnown && (
             <button type="button" className="known-button" aria-pressed={known} onClick={onToggleKnown}>
               {known ? "✓ もう分かる（印を外す）" : "もう分かる"}

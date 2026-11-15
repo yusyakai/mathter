@@ -97,7 +97,24 @@ export const axisMax: Problem = {
         "a1"
       ],
       "title": "軸は $x=a$。$a$ によって放物線が左右に動く",
-      "detail": "$a$ が変わると軸が左右に動き、どちらの端点が高いかが入れ替わる。"
+      "detail": "$a$ が変わると軸が左右に動き、どちらの端点が高いかが入れ替わる。",
+      "graph": {
+        "expr": "x^2-2ax",
+        "param": {
+          "name": "a",
+          "min": -1,
+          "max": 3,
+          "value": 0.5
+        },
+        "xMin": -2,
+        "xMax": 4,
+        "yMin": -10,
+        "yMax": 9,
+        "domain": [
+          "0",
+          "2"
+        ]
+      }
     },
     {
       "id": "c2",

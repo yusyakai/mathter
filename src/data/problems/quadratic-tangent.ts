@@ -82,7 +82,20 @@ export const tangent: Problem = {
         "a2"
       ],
       "title": "接する ⇔ $D=0$",
-      "detail": "共有点が1個 ＝ 実数解が1個（重解） ＝ 判別式が $0$。"
+      "detail": "共有点が1個 ＝ 実数解が1個（重解） ＝ 判別式が $0$。",
+      "graph": {
+        "expr": "x^2-2kx+k+2",
+        "param": {
+          "name": "k",
+          "min": -2,
+          "max": 3,
+          "value": 0.5
+        },
+        "xMin": -4,
+        "xMax": 6,
+        "yMin": -4,
+        "yMax": 10
+      }
     },
     {
       "id": "c2",

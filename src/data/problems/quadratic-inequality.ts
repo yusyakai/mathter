@@ -79,7 +79,14 @@ export const inequality: Problem = {
         "a2"
       ],
       "title": "グラフは $x$ 軸と $x=-2,\\ 3$ で交わる",
-      "detail": "交点が分かれば、グラフのおおよその形がかける。"
+      "detail": "交点が分かれば、グラフのおおよその形がかける。",
+      "graph": {
+        "expr": "x^2-x-6",
+        "xMin": -4,
+        "xMax": 5,
+        "yMin": -8,
+        "yMax": 8
+      }
     },
     {
       "id": "c2",

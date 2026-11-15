@@ -77,6 +77,15 @@ export const quadraticMin: Problem = {
       title: "軸は $x=a$。$a$ によって放物線が左右に動く",
       detail:
         "平方完成すると $y=(x-a)^2-a^2+3$。軸は $x=a$、頂点は $(a,\\,-a^2+3)$。$a$ が変わると軸が左右に動く。",
+      graph: {
+        expr: "x^2-2ax+3",
+        param: { name: "a", min: -1, max: 3, value: 1 },
+        xMin: -2.5,
+        xMax: 4.5,
+        yMin: -7,
+        yMax: 12,
+        domain: ["0", "2"],
+      },
     },
     {
       id: "c2",

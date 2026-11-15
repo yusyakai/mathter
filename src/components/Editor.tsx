@@ -21,6 +21,7 @@ import {
 } from "../library";
 import { sourcesOf } from "../thoughts";
 import type { Problem } from "../types";
+import { GraphEditor } from "./GraphEditor";
 import { downloadProblem } from "./MyProblems";
 import { ProblemText } from "./ProblemText";
 import { Rich } from "./Rich";
@@ -307,6 +308,7 @@ export function Editor({ problem }: { problem: Problem }) {
                       placeholder="なぜそう考えるか、どう使うか"
                       onChange={(detail) => set({ detail })}
                     />
+                    <GraphEditor value={a.graph} onChange={(graph) => set({ graph })} />
                     <RowButtons onDelete={() => update((d) => removeThought(d, a.id))} />
                   </div>
                 );
@@ -386,6 +388,7 @@ export function Editor({ problem }: { problem: Problem }) {
                 value={c.detail}
                 onChange={(detail) => set({ detail })}
               />
+              <GraphEditor value={c.graph} onChange={(graph) => set({ graph })} />
               <RowButtons onDelete={() => update((d) => removeThought(d, c.id))} />
             </div>
           );
