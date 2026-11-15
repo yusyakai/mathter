@@ -22,6 +22,7 @@ import {
 } from "../thoughts";
 import { useSettings } from "../settings";
 import { loadState, saveState, type Saved } from "../storage";
+import { useStudyTimer } from "../studyTime";
 import type { SlotResult } from "../thoughts";
 import type { Problem, Thought } from "../types";
 import { Graph } from "./Graph";
@@ -69,6 +70,7 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
   const [boardMessage, setBoardMessage] = useState<string | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const { partnerHint } = useSettings();
+  useStudyTimer();
 
   useEffect(() => saveState(problem.id, saved), [problem.id, saved]);
 

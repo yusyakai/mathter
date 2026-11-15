@@ -52,3 +52,13 @@ test("学習の記録を消すと、ボードと連想ノートが最初に戻�
   await page.goto("/#/p/quadratic-min");
   await expect(board(page).locator(".card")).toHaveCount(0);
 });
+
+test("問題を開いていた時間が、学習時間として一覧に出る", async ({ page }) => {
+  await page.clock.install();
+  await page.goto("/#/p/quadratic-min");
+  await page.locator(".problem-text .fragment").first().click();
+  await page.clock.runFor(5 * 60 * 1000);
+  await page.goto("/#/");
+  await expect(page.locator(".study-time")).toContainText("今日 5分");
+  await expect(page.locator(".study-time")).toContainText("合計 5分");
+});

@@ -7,6 +7,7 @@ import {
   useCustomProblems,
 } from "../library";
 import { loadState } from "../storage";
+import { dayKey, formatDuration, totalSeconds, useStudyTime } from "../studyTime";
 import { checkSlot } from "../thoughts";
 import type { Problem } from "../types";
 import { label } from "../editor/draft";
@@ -33,6 +34,8 @@ export function ProblemList() {
   const [state, setState] = useState<"" | Status>("");
   const [pattern, setPattern] = useState("");
   const [word, setWord] = useState("");
+  const time = useStudyTime();
+  const total = totalSeconds(time);
 
   const units = [...new Set(problems.map((p) => p.unit))];
   const usedPatterns = patterns.filter((x) =>
@@ -50,6 +53,11 @@ export function ProblemList() {
 
   return (
     <main className="page">
+      {total > 0 && (
+        <p className="study-time">
+          学習時間　今日 {formatDuration(time[dayKey(new Date())] ?? 0)} ／ 合計 {formatDuration(total)}
+        </p>
+      )}
       <div className="filters">
         <select aria-label="単元でしぼる" value={unit} onChange={(e) => setUnit(e.target.value)}>
           <option value="">すべての単元</option>

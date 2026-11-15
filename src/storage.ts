@@ -1,4 +1,5 @@
 import { playableProblems } from "./library";
+import { resetStudyTime, TIME_KEY } from "./studyTime";
 import { sanitizeBoard, sanitizePlaced } from "./thoughts";
 import type { Problem } from "./types";
 
@@ -81,13 +82,16 @@ export function saveRecord(record: LearnerRecord): void {
   }
 }
 
-/** 学習の記録（ボードの状態と、型の記録）をすべて消す。自作の問題と型は残す。 */
+/** 学習の記録（ボードの状態、型の記録、学習時間）をすべて消す。自作の問題と型は残す。 */
 export function clearLearning(): void {
   try {
     for (const key of Object.keys(localStorage)) {
-      if (key.startsWith("mathter:state:") || key === RECORD_KEY) localStorage.removeItem(key);
+      if (key.startsWith("mathter:state:") || key === RECORD_KEY || key === TIME_KEY) {
+        localStorage.removeItem(key);
+      }
     }
   } catch {
     // 消せなくても、ほかの機能には影響しない
   }
+  resetStudyTime();
 }

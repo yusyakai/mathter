@@ -39,7 +39,7 @@ export function SettingsPage({ onCleared }: { onCleared: () => void }) {
       <h2 className="page-heading">この端末の記録</h2>
       <section className="panel">
         <p className="guide">
-          思考ボード・解答ボードに置いたカードと、連想ノートの記録を消して、最初の状態に戻します。自作の問題と自作の型は消えません。
+          思考ボード・解答ボードに置いたカード、連想ノートの記録、学習時間を消して、最初の状態に戻します。自作の問題と自作の型は消えません。
         </p>
         <button
           type="button"
