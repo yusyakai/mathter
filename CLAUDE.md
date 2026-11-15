@@ -10,15 +10,16 @@
 
 - Vite + React + TypeScript（ウェブアプリ。スマホ・PC共通。将来のVRは別の仕組みで作る方針）
 - 数式は KaTeX。文字列中の `$...$` を数式として表示する
-- テストは Vitest
+- テストは Vitest（ロジックと問題データ）と Playwright（画面を実際に操作する。`e2e/`）
 - ドラッグ＆ドロップは @dnd-kit/core（マウス・タッチ長押し・キーボード）
-- 学習の状態（ボード、型の記録）と自作の問題は端末内（localStorage）にのみ保存する。自作の問題はファイル（JSON）に書き出し・読み込みできる
+- 学習の状態（ボード、型の記録）と自作の問題は端末内（localStorage）にのみ保存する。自作の問題と自作の型はファイル（JSON）に書き出し・読み込みできる
 - 画面の切り替えは URL の `#`（`#/` 一覧、`#/p/問題id`、`#/note` 連想ノート、`#/edit` 自作の問題の一覧、`#/edit/問題id` 問題を作る画面）
 
 ## コマンド
 
 - `npm run dev` 開発サーバー
 - `npm test` テスト（問題データの検査を含む）
+- `npm run e2e` 画面を操作するテスト（ビルドしてから動かす。画面を変えたら実行する）
 - `npm run typecheck` 型検査
 - `npm run build` 型検査＋ビルド（`dist/`）
 
@@ -33,7 +34,8 @@ GitHub Pages（`https://yusyakai.github.io/mathter/`）。`.github/workflows/dep
 - `src/data/problems/` 内蔵する問題（1問1ファイル、`index.ts` に登録）
 - `src/thoughts.ts` 考えの組み合わせ、解答ボードの判定、問題データ検査のロジック（画面に依存しない）
 - `src/storage.ts` 学習の状態の保存と読み込み
-- `src/library.ts` 自作の問題の保存と、学習画面で使える問題の一覧（内蔵＋自作）
+- `src/library.ts` 自作の問題・自作の型の保存、書き出しファイルの形、学習画面で使える問題の一覧（内蔵＋自作）
+- `src/editor/ai.ts` AIの下書き（指示文を作る、AIの返事を下書きに直す）。アプリからAIは呼ばず、利用者が手元のAIチャットに貼って使う
 - `src/editor/draft.ts` 問題を作る画面のロジック（下書き ⇔ 問題データの変換、着眼点の位置合わせ、直すことの一覧。画面に依存しない）
 - `src/components/Workspace.tsx` 学習画面。「問題 → 思考ボード → 解答ボード（下に模範解答）」を並べる
 - `src/components/ProblemText.tsx` 問題文と着眼点の表示

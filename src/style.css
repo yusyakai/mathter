@@ -216,3 +216,12 @@ li.problem-item:hover { border-color: var(--line); }
 .issues { margin: 8px 0 0; padding: 8px 12px 8px 30px; border-radius: 8px; font-size: 0.85rem; background: #fdecea; color: #8a1c14; }
 .issues li.is-note { color: var(--muted); }
 @media (prefers-color-scheme: dark) { .issues { background: #3a1d1a; color: #ffb4ab; } }
+.page-heading .hint-button { margin: 0; }
+.primary:disabled { opacity: 0.4; cursor: default; }
+.new-pattern { margin: 0 0 10px; padding: 8px 12px; border: 1px dashed var(--accent); border-radius: 10px; }
+.ai-panel { margin: 12px 0; }
+.ai-panel details { margin-top: 8px; font-size: 0.9rem; color: var(--muted); }
+.prompt-view {
+  width: 100%; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--bg); color: var(--text); font-family: ui-monospace, monospace; font-size: 0.75rem; line-height: 1.5;
+}

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { patterns } from "../data/patterns";
 import {
   addMark,
   editText,
@@ -13,7 +12,13 @@ import {
   type Draft,
   type Section,
 } from "../editor/draft";
-import { saveCustom } from "../library";
+import {
+  allPatterns,
+  newPatternId,
+  saveCustom,
+  saveCustomPattern,
+  useCustomPatterns,
+} from "../library";
 import { sourcesOf } from "../thoughts";
 import type { Problem } from "../types";
 import { downloadProblem } from "./MyProblems";
@@ -37,6 +42,9 @@ const toggle = (list: string[], id: string) =>
 export function Editor({ problem }: { problem: Problem }) {
   const [draft, setDraft] = useState<Draft>(() => fromProblem(problem));
   const [pickError, setPickError] = useState<string | null>(null);
+  /** 新しい型を作っている途中の連想と、入力中の「きっかけ」 */
+  const [newPattern, setNewPattern] = useState<{ for: string; trigger: string } | null>(null);
+  const patterns = allPatterns(useCustomPatterns());
   const textRef = useRef<HTMLTextAreaElement | null>(null);
 
   const update = (fn: (d: Draft) => Draft) => setDraft(fn);
@@ -220,6 +228,9 @@ export function Editor({ problem }: { problem: Problem }) {
                       <select
                         value={a.patternId ?? ""}
                         onChange={(e) => {
+                          if (e.target.value === "__new") {
+                            return setNewPattern({ for: a.id, trigger: "" });
+                          }
                           const p = patterns.find((x) => x.id === e.target.value);
                           set({
                             patternId: p?.id,
@@ -229,8 +240,9 @@ export function Editor({ problem }: { problem: Problem }) {
                         }}
                       >
                         <option value="">型なし（この問題だけの連想）</option>
+                        <option value="__new">＋ 新しい型を作る…</option>
                         {units.map((u) => (
-                          <optgroup key={u} label={u}>
+                          <optgroup key={u} label={u || "単元なし"}>
                             {patterns
                               .filter((p) => p.unit === u)
                               .map((p) => (
@@ -242,6 +254,45 @@ export function Editor({ problem }: { problem: Problem }) {
                         ))}
                       </select>
                     </label>
+                    {newPattern?.for === a.id && (
+                      <div className="new-pattern">
+                        <p className="guide">
+                          型は、別の問題でも使える「何を見たら → 何を連想するか」です。下の「連想の一言」と「考える内容」が、そのまま型の中身になります。この問題だけの数値は入れないようにします。
+                        </p>
+                        <TextField
+                          label="きっかけ（何を見たら）"
+                          value={newPattern.trigger}
+                          placeholder="例：「接する」"
+                          onChange={(trigger) => setNewPattern({ for: a.id, trigger })}
+                        />
+                        <span className="row-buttons">
+                          <button type="button" onClick={() => setNewPattern(null)}>
+                            やめる
+                          </button>
+                          <button
+                            type="button"
+                            disabled={newPattern.trigger.trim() === "" || a.title.trim() === ""}
+                            onClick={() => {
+                              const id = newPatternId();
+                              saveCustomPattern({
+                                id,
+                                unit: draft.unit.trim(),
+                                trigger: newPattern.trigger.trim(),
+                                idea: a.title.trim(),
+                                detail: a.detail.trim(),
+                              });
+                              set({ patternId: id });
+                              setNewPattern(null);
+                            }}
+                          >
+                            この型を作る
+                          </button>
+                        </span>
+                        {a.title.trim() === "" && (
+                          <p className="guide">先に、下の「連想の一言」を入れてください。</p>
+                        )}
+                      </div>
+                    )}
                     <TextField
                       label="連想の一言（カードに出る）"
                       value={a.title}

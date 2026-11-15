@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { patterns } from "../data/patterns";
-import { playableProblems, useCustomProblems } from "../library";
+import { allPatterns, playableProblems, useCustomPatterns, useCustomProblems } from "../library";
 import type { LearnerRecord } from "../storage";
 import { Rich } from "./Rich";
 
@@ -15,6 +14,7 @@ export function Notebook({ record, onToggleKnown }: Props) {
   const toggle = (id: string) =>
     setOpened((o) => (o.includes(id) ? o.filter((x) => x !== id) : [...o, id]));
   const problems = playableProblems(useCustomProblems());
+  const patterns = allPatterns(useCustomPatterns());
   const units = [...new Set(patterns.map((p) => p.unit))];
 
   return (
@@ -28,7 +28,7 @@ export function Notebook({ record, onToggleKnown }: Props) {
         return (
           <section key={unit}>
             <h2 className="page-heading">
-              {unit}
+              {unit || "単元なし"}
               <span className="count">
                 集めた型 {mine.length} / {all.length}
               </span>

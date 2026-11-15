@@ -492,7 +492,7 @@ function Card({
         isTarget ? "is-target" : "",
         highlighted ? "is-highlighted" : "",
       ].join(" ")}
-      {...drag.attributes}
+      {...(placed ? {} : drag.attributes)}
       {...drag.listeners}
     >
       {sources && (

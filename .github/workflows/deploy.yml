@@ -32,6 +32,19 @@ jobs:
         with:
           path: dist
 
+  # 画面を実際に操作するテスト。失敗しても公開は止めない（結果は Actions の画面で確かめる）
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
