@@ -44,6 +44,8 @@ test("思考ボードのカードは単語や短い文で、タップすると�
   await expect(card.locator(".card-detail")).toHaveCount(0);
   await boardCard(page, "a1").click();
   await expect(card.locator(".card-detail")).toContainText("頂点");
+  // 問題の下にある同じ連想は、一緒には開かない（説明が2か所に出ないように）
+  await expect(candidate(page, "a1").locator(".card-detail")).toHaveCount(0);
   await boardCard(page, "a1").click();
   await expect(card.locator(".card-detail")).toHaveCount(0);
 });

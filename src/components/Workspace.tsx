@@ -73,6 +73,7 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
   const { board, found, rows } = saved;
   const [checked, setChecked] = useState(false);
   const [fragment, setFragment] = useState<string | null>(null);
+  /** 説明を開いているカード。問題の下の連想と思考ボードのカードは、別々に開け閉めする */
   const [opened, setOpened] = useState<string[]>([]);
   const [stepId, setStepId] = useState<string | null>(null);
   const [showSolution, setShowSolution] = useState(false);
@@ -168,7 +169,7 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
       const combo = findCombination(problem, id, zone.thoughtId);
       if (combo && !nextBoard.includes(combo.id)) {
         nextBoard = [...nextBoard, combo.id];
-        setOpened((o) => [...o, combo.id]);
+        setOpened((o) => [...o, `board:${combo.id}`]);
         setBoardMessage("2つの考えがくっついて、新しい考えになりました。");
       } else {
         setBoardMessage("この2つからは、新しい考えは生まれませんでした。");
@@ -301,15 +302,15 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
           {candidates.length > 0 && (
             <ul className="thoughts">
               {candidates.map((a) => (
-                <li key={a.id} className={opened.includes(a.id) ? "is-open" : ""}>
+                <li key={a.id} className={opened.includes(`cand:${a.id}`) ? "is-open" : ""}>
                   <Card
                     thought={thoughts.get(a.id)!}
                     where="cand"
                     known={isKnown(a.id)}
                     onToggleKnown={toggleKnownOf(a.id)}
                     placed={board.includes(a.id)}
-                    open={opened.includes(a.id)}
-                    onToggle={() => toggleOpen(a.id)}
+                    open={opened.includes(`cand:${a.id}`)}
+                    onToggle={() => toggleOpen(`cand:${a.id}`)}
                   />
                 </li>
               ))}
@@ -333,7 +334,7 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
             {cards.map((id) => {
               const t = thoughts.get(id)!;
               return (
-                <li key={id} className={opened.includes(id) ? "is-open" : ""}>
+                <li key={id} className={opened.includes(`board:${id}`) ? "is-open" : ""}>
                   <Card
                     thought={t}
                     where="board"
@@ -342,8 +343,8 @@ export function Workspace({ problem, known, onCollect, onToggleKnown }: Props) {
                     partner={partners.includes(id)}
                     used={used.has(id)}
                     highlighted={stepCards.includes(id)}
-                    open={opened.includes(id)}
-                    onToggle={() => toggleOpen(id)}
+                    open={opened.includes(`board:${id}`)}
+                    onToggle={() => toggleOpen(`board:${id}`)}
                     sources={
                       t.kind === "combination"
                         ? t.from.map((f) => thoughts.get(f)?.title ?? f)
